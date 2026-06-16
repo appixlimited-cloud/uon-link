@@ -103,10 +103,10 @@ function ProfilePage() {
                   <div><span className="text-muted-foreground">Email</span><div className="font-medium">{user.email}</div></div>
                   <div><span className="text-muted-foreground">Phone</span><div className="font-medium">{p?.phone || "—"}</div></div>
                 </div>
-                {p?.interests?.length > 0 && (
+                {(p?.interests?.length ?? 0) > 0 && (
                   <div className="mt-4">
                     <span className="text-muted-foreground text-sm">Interests</span>
-                    <div className="mt-1 flex flex-wrap gap-1.5">{p.interests.map((i: string) => <span key={i} className="rounded-full bg-accent px-2.5 py-1 text-xs text-accent-foreground">{i}</span>)}</div>
+                    <div className="mt-1 flex flex-wrap gap-1.5">{(p?.interests ?? []).map((i: string) => <span key={i} className="rounded-full bg-accent px-2.5 py-1 text-xs text-accent-foreground">{i}</span>)}</div>
                   </div>
                 )}
               </div>
