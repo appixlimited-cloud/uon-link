@@ -29,6 +29,22 @@ import { Route as EventsSlugRouteImport } from './routes/events.$slug'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as AuthenticatedAdminStudentsRouteImport } from './routes/_authenticated/admin/students'
+import { Route as AuthenticatedAdminSpotlightRouteImport } from './routes/_authenticated/admin/spotlight'
+import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
+import { Route as AuthenticatedAdminRegistrationsRouteImport } from './routes/_authenticated/admin/registrations'
+import { Route as AuthenticatedAdminOpportunitiesRouteImport } from './routes/_authenticated/admin/opportunities'
+import { Route as AuthenticatedAdminNoticesRouteImport } from './routes/_authenticated/admin/notices'
+import { Route as AuthenticatedAdminFeaturedRouteImport } from './routes/_authenticated/admin/featured'
+import { Route as AuthenticatedAdminExportRouteImport } from './routes/_authenticated/admin/export'
+import { Route as AuthenticatedAdminEventsRouteImport } from './routes/_authenticated/admin/events'
+import { Route as AuthenticatedAdminCreateEventRouteImport } from './routes/_authenticated/admin/create-event'
+import { Route as AuthenticatedAdminClubsRouteImport } from './routes/_authenticated/admin/clubs'
+import { Route as AuthenticatedAdminCalendarRouteImport } from './routes/_authenticated/admin/calendar'
+import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
+import { Route as AuthenticatedAdminEventsIdRouteImport } from './routes/_authenticated/admin/events.$id'
 
 const UniVibeRoute = UniVibeRouteImport.update({
   id: '/uni-vibe',
@@ -129,6 +145,99 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedAdminStudentsRoute =
+  AuthenticatedAdminStudentsRouteImport.update({
+    id: '/students',
+    path: '/students',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminSpotlightRoute =
+  AuthenticatedAdminSpotlightRouteImport.update({
+    id: '/spotlight',
+    path: '/spotlight',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminSettingsRoute =
+  AuthenticatedAdminSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminRegistrationsRoute =
+  AuthenticatedAdminRegistrationsRouteImport.update({
+    id: '/registrations',
+    path: '/registrations',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminOpportunitiesRoute =
+  AuthenticatedAdminOpportunitiesRouteImport.update({
+    id: '/opportunities',
+    path: '/opportunities',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminNoticesRoute =
+  AuthenticatedAdminNoticesRouteImport.update({
+    id: '/notices',
+    path: '/notices',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminFeaturedRoute =
+  AuthenticatedAdminFeaturedRouteImport.update({
+    id: '/featured',
+    path: '/featured',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminExportRoute =
+  AuthenticatedAdminExportRouteImport.update({
+    id: '/export',
+    path: '/export',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminEventsRoute =
+  AuthenticatedAdminEventsRouteImport.update({
+    id: '/events',
+    path: '/events',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminCreateEventRoute =
+  AuthenticatedAdminCreateEventRouteImport.update({
+    id: '/create-event',
+    path: '/create-event',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminClubsRoute = AuthenticatedAdminClubsRouteImport.update({
+  id: '/clubs',
+  path: '/clubs',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedAdminCalendarRoute =
+  AuthenticatedAdminCalendarRouteImport.update({
+    id: '/calendar',
+    path: '/calendar',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminAnalyticsRoute =
+  AuthenticatedAdminAnalyticsRouteImport.update({
+    id: '/analytics',
+    path: '/analytics',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminEventsIdRoute =
+  AuthenticatedAdminEventsIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedAdminEventsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -146,10 +255,26 @@ export interface FileRoutesByFullPath {
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
   '/uni-vibe': typeof UniVibeRoute
+  '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/events/$slug': typeof EventsSlugRoute
+  '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
+  '/admin/calendar': typeof AuthenticatedAdminCalendarRoute
+  '/admin/clubs': typeof AuthenticatedAdminClubsRoute
+  '/admin/create-event': typeof AuthenticatedAdminCreateEventRoute
+  '/admin/events': typeof AuthenticatedAdminEventsRouteWithChildren
+  '/admin/export': typeof AuthenticatedAdminExportRoute
+  '/admin/featured': typeof AuthenticatedAdminFeaturedRoute
+  '/admin/notices': typeof AuthenticatedAdminNoticesRoute
+  '/admin/opportunities': typeof AuthenticatedAdminOpportunitiesRoute
+  '/admin/registrations': typeof AuthenticatedAdminRegistrationsRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/admin/spotlight': typeof AuthenticatedAdminSpotlightRoute
+  '/admin/students': typeof AuthenticatedAdminStudentsRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/admin/events/$id': typeof AuthenticatedAdminEventsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -171,6 +296,21 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/events/$slug': typeof EventsSlugRoute
+  '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
+  '/admin/calendar': typeof AuthenticatedAdminCalendarRoute
+  '/admin/clubs': typeof AuthenticatedAdminClubsRoute
+  '/admin/create-event': typeof AuthenticatedAdminCreateEventRoute
+  '/admin/events': typeof AuthenticatedAdminEventsRouteWithChildren
+  '/admin/export': typeof AuthenticatedAdminExportRoute
+  '/admin/featured': typeof AuthenticatedAdminFeaturedRoute
+  '/admin/notices': typeof AuthenticatedAdminNoticesRoute
+  '/admin/opportunities': typeof AuthenticatedAdminOpportunitiesRoute
+  '/admin/registrations': typeof AuthenticatedAdminRegistrationsRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/admin/spotlight': typeof AuthenticatedAdminSpotlightRoute
+  '/admin/students': typeof AuthenticatedAdminStudentsRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
+  '/admin/events/$id': typeof AuthenticatedAdminEventsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -190,10 +330,26 @@ export interface FileRoutesById {
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
   '/uni-vibe': typeof UniVibeRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/events/$slug': typeof EventsSlugRoute
+  '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
+  '/_authenticated/admin/calendar': typeof AuthenticatedAdminCalendarRoute
+  '/_authenticated/admin/clubs': typeof AuthenticatedAdminClubsRoute
+  '/_authenticated/admin/create-event': typeof AuthenticatedAdminCreateEventRoute
+  '/_authenticated/admin/events': typeof AuthenticatedAdminEventsRouteWithChildren
+  '/_authenticated/admin/export': typeof AuthenticatedAdminExportRoute
+  '/_authenticated/admin/featured': typeof AuthenticatedAdminFeaturedRoute
+  '/_authenticated/admin/notices': typeof AuthenticatedAdminNoticesRoute
+  '/_authenticated/admin/opportunities': typeof AuthenticatedAdminOpportunitiesRoute
+  '/_authenticated/admin/registrations': typeof AuthenticatedAdminRegistrationsRoute
+  '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/_authenticated/admin/spotlight': typeof AuthenticatedAdminSpotlightRoute
+  '/_authenticated/admin/students': typeof AuthenticatedAdminStudentsRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/admin/events/$id': typeof AuthenticatedAdminEventsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -213,10 +369,26 @@ export interface FileRouteTypes {
     | '/support'
     | '/terms'
     | '/uni-vibe'
+    | '/admin'
     | '/dashboard'
     | '/profile'
     | '/settings'
     | '/events/$slug'
+    | '/admin/analytics'
+    | '/admin/calendar'
+    | '/admin/clubs'
+    | '/admin/create-event'
+    | '/admin/events'
+    | '/admin/export'
+    | '/admin/featured'
+    | '/admin/notices'
+    | '/admin/opportunities'
+    | '/admin/registrations'
+    | '/admin/settings'
+    | '/admin/spotlight'
+    | '/admin/students'
+    | '/admin/'
+    | '/admin/events/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -238,6 +410,21 @@ export interface FileRouteTypes {
     | '/profile'
     | '/settings'
     | '/events/$slug'
+    | '/admin/analytics'
+    | '/admin/calendar'
+    | '/admin/clubs'
+    | '/admin/create-event'
+    | '/admin/events'
+    | '/admin/export'
+    | '/admin/featured'
+    | '/admin/notices'
+    | '/admin/opportunities'
+    | '/admin/registrations'
+    | '/admin/settings'
+    | '/admin/spotlight'
+    | '/admin/students'
+    | '/admin'
+    | '/admin/events/$id'
   id:
     | '__root__'
     | '/'
@@ -256,10 +443,26 @@ export interface FileRouteTypes {
     | '/support'
     | '/terms'
     | '/uni-vibe'
+    | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/_authenticated/profile'
     | '/_authenticated/settings'
     | '/events/$slug'
+    | '/_authenticated/admin/analytics'
+    | '/_authenticated/admin/calendar'
+    | '/_authenticated/admin/clubs'
+    | '/_authenticated/admin/create-event'
+    | '/_authenticated/admin/events'
+    | '/_authenticated/admin/export'
+    | '/_authenticated/admin/featured'
+    | '/_authenticated/admin/notices'
+    | '/_authenticated/admin/opportunities'
+    | '/_authenticated/admin/registrations'
+    | '/_authenticated/admin/settings'
+    | '/_authenticated/admin/spotlight'
+    | '/_authenticated/admin/students'
+    | '/_authenticated/admin/'
+    | '/_authenticated/admin/events/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -423,16 +626,184 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/students': {
+      id: '/_authenticated/admin/students'
+      path: '/students'
+      fullPath: '/admin/students'
+      preLoaderRoute: typeof AuthenticatedAdminStudentsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/spotlight': {
+      id: '/_authenticated/admin/spotlight'
+      path: '/spotlight'
+      fullPath: '/admin/spotlight'
+      preLoaderRoute: typeof AuthenticatedAdminSpotlightRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/settings': {
+      id: '/_authenticated/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/registrations': {
+      id: '/_authenticated/admin/registrations'
+      path: '/registrations'
+      fullPath: '/admin/registrations'
+      preLoaderRoute: typeof AuthenticatedAdminRegistrationsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/opportunities': {
+      id: '/_authenticated/admin/opportunities'
+      path: '/opportunities'
+      fullPath: '/admin/opportunities'
+      preLoaderRoute: typeof AuthenticatedAdminOpportunitiesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/notices': {
+      id: '/_authenticated/admin/notices'
+      path: '/notices'
+      fullPath: '/admin/notices'
+      preLoaderRoute: typeof AuthenticatedAdminNoticesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/featured': {
+      id: '/_authenticated/admin/featured'
+      path: '/featured'
+      fullPath: '/admin/featured'
+      preLoaderRoute: typeof AuthenticatedAdminFeaturedRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/export': {
+      id: '/_authenticated/admin/export'
+      path: '/export'
+      fullPath: '/admin/export'
+      preLoaderRoute: typeof AuthenticatedAdminExportRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/events': {
+      id: '/_authenticated/admin/events'
+      path: '/events'
+      fullPath: '/admin/events'
+      preLoaderRoute: typeof AuthenticatedAdminEventsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/create-event': {
+      id: '/_authenticated/admin/create-event'
+      path: '/create-event'
+      fullPath: '/admin/create-event'
+      preLoaderRoute: typeof AuthenticatedAdminCreateEventRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/clubs': {
+      id: '/_authenticated/admin/clubs'
+      path: '/clubs'
+      fullPath: '/admin/clubs'
+      preLoaderRoute: typeof AuthenticatedAdminClubsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/calendar': {
+      id: '/_authenticated/admin/calendar'
+      path: '/calendar'
+      fullPath: '/admin/calendar'
+      preLoaderRoute: typeof AuthenticatedAdminCalendarRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/analytics': {
+      id: '/_authenticated/admin/analytics'
+      path: '/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AuthenticatedAdminAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/events/$id': {
+      id: '/_authenticated/admin/events/$id'
+      path: '/$id'
+      fullPath: '/admin/events/$id'
+      preLoaderRoute: typeof AuthenticatedAdminEventsIdRouteImport
+      parentRoute: typeof AuthenticatedAdminEventsRoute
+    }
   }
 }
 
+interface AuthenticatedAdminEventsRouteChildren {
+  AuthenticatedAdminEventsIdRoute: typeof AuthenticatedAdminEventsIdRoute
+}
+
+const AuthenticatedAdminEventsRouteChildren: AuthenticatedAdminEventsRouteChildren =
+  {
+    AuthenticatedAdminEventsIdRoute: AuthenticatedAdminEventsIdRoute,
+  }
+
+const AuthenticatedAdminEventsRouteWithChildren =
+  AuthenticatedAdminEventsRoute._addFileChildren(
+    AuthenticatedAdminEventsRouteChildren,
+  )
+
+interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminAnalyticsRoute: typeof AuthenticatedAdminAnalyticsRoute
+  AuthenticatedAdminCalendarRoute: typeof AuthenticatedAdminCalendarRoute
+  AuthenticatedAdminClubsRoute: typeof AuthenticatedAdminClubsRoute
+  AuthenticatedAdminCreateEventRoute: typeof AuthenticatedAdminCreateEventRoute
+  AuthenticatedAdminEventsRoute: typeof AuthenticatedAdminEventsRouteWithChildren
+  AuthenticatedAdminExportRoute: typeof AuthenticatedAdminExportRoute
+  AuthenticatedAdminFeaturedRoute: typeof AuthenticatedAdminFeaturedRoute
+  AuthenticatedAdminNoticesRoute: typeof AuthenticatedAdminNoticesRoute
+  AuthenticatedAdminOpportunitiesRoute: typeof AuthenticatedAdminOpportunitiesRoute
+  AuthenticatedAdminRegistrationsRoute: typeof AuthenticatedAdminRegistrationsRoute
+  AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
+  AuthenticatedAdminSpotlightRoute: typeof AuthenticatedAdminSpotlightRoute
+  AuthenticatedAdminStudentsRoute: typeof AuthenticatedAdminStudentsRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+}
+
+const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
+  {
+    AuthenticatedAdminAnalyticsRoute: AuthenticatedAdminAnalyticsRoute,
+    AuthenticatedAdminCalendarRoute: AuthenticatedAdminCalendarRoute,
+    AuthenticatedAdminClubsRoute: AuthenticatedAdminClubsRoute,
+    AuthenticatedAdminCreateEventRoute: AuthenticatedAdminCreateEventRoute,
+    AuthenticatedAdminEventsRoute: AuthenticatedAdminEventsRouteWithChildren,
+    AuthenticatedAdminExportRoute: AuthenticatedAdminExportRoute,
+    AuthenticatedAdminFeaturedRoute: AuthenticatedAdminFeaturedRoute,
+    AuthenticatedAdminNoticesRoute: AuthenticatedAdminNoticesRoute,
+    AuthenticatedAdminOpportunitiesRoute: AuthenticatedAdminOpportunitiesRoute,
+    AuthenticatedAdminRegistrationsRoute: AuthenticatedAdminRegistrationsRoute,
+    AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
+    AuthenticatedAdminSpotlightRoute: AuthenticatedAdminSpotlightRoute,
+    AuthenticatedAdminStudentsRoute: AuthenticatedAdminStudentsRoute,
+    AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  }
+
+const AuthenticatedAdminRouteRouteWithChildren =
+  AuthenticatedAdminRouteRoute._addFileChildren(
+    AuthenticatedAdminRouteRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
