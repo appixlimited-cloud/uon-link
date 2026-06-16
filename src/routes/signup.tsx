@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Eye, EyeOff, Mail, Phone } from "lucide-react";
+import { Eye, EyeOff, Mail } from "lucide-react";
 import { PageShell } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,26 +15,26 @@ export const Route = createFileRoute("/signup")({
   component: SignupPage,
 });
 
-type Step = "form" | "method" | "verify";
-type Method = "email" | "phone";
-
 function SignupPage() {
   const navigate = useNavigate();
-  const [step, setStep] = useState<Step>("form");
-  const [method, setMethod] = useState<Method>("email");
+  const [sent, setSent] = useState(false);
   const [show, setShow] = useState(false);
   const [show2, setShow2] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [resendIn, setResendIn] = useState(0);
   const [form, setForm] = useState({
     full_name: "", email: "", password: "", confirm: "",
     registration_number: "", phone: "", faculty: "Arts", year_of_study: "First Year",
   });
   const [interests, setInterests] = useState<string[]>([]);
-  const [otp, setOtp] = useState("");
-  const [resendIn, setResendIn] = useState(0);
 
   function toggleInterest(i: string) {
     setInterests((cur) => cur.includes(i) ? cur.filter((x) => x !== i) : [...cur, i]);
+  }
+
+  function startResendTimer() {
+    setResendIn(60);
+    const t = setInterval(() => setResendIn((n) => { if (n <= 1) { clearInterval(t); return 0; } return n - 1; }), 1000);
   }
 
   async function submitForm(e: React.FormEvent) {
@@ -46,6 +46,7 @@ function SignupPage() {
       email: form.email,
       password: form.password,
       options: {
+        emailRedirectTo: `${window.location.origin}/dashboard`,
         data: {
           full_name: form.full_name,
           registration_number: form.registration_number,
@@ -63,110 +64,49 @@ function SignupPage() {
       }
       return toast.error(error.message);
     }
-    toast.success("Account created! Choose how to verify.");
-    setStep("method");
-  }
-
-  function startResendTimer() {
-    setResendIn(60);
-    const t = setInterval(() => setResendIn((n) => { if (n <= 1) { clearInterval(t); return 0; } return n - 1; }), 1000);
-  }
-
-  async function sendCode(m: Method) {
-    setLoading(true);
-    try {
-      if (m === "email") {
-        const { error } = await supabase.auth.signInWithOtp({ email: form.email, options: { shouldCreateUser: false } });
-        if (error) throw error;
-        toast.success(`Code sent to ${form.email}`);
-      } else {
-        if (!form.phone) throw new Error("Please go back and add a phone number");
-        const { error } = await supabase.auth.updateUser({ phone: form.phone });
-        if (error) throw error;
-        toast.success(`Code sent to ${form.phone}`);
-      }
-      setMethod(m);
-      setStep("verify");
-      startResendTimer();
-    } catch (e: any) {
-      toast.error(e.message ?? "Could not send code");
-    } finally {
-      setLoading(false);
-    }
+    toast.success("Confirmation email sent!");
+    setSent(true);
+    startResendTimer();
   }
 
   async function resend() {
     if (resendIn > 0) return;
-    await sendCode(method);
-  }
-
-  async function verify(e: React.FormEvent) {
-    e.preventDefault();
-    if (otp.length !== 6) return toast.error("Enter the 6-digit code");
     setLoading(true);
-    const args = method === "email"
-      ? { email: form.email, token: otp, type: "email" as const }
-      : { phone: form.phone, token: otp, type: "phone_change" as const };
-    const { error } = await supabase.auth.verifyOtp(args);
-    if (error) { setLoading(false); return toast.error("Incorrect code. Please try again."); }
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) await supabase.from("student_profiles").update({ is_verified: true }).eq("user_id", user.id);
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email: form.email,
+      options: { emailRedirectTo: `${window.location.origin}/dashboard` },
+    });
     setLoading(false);
-    toast.success("Account verified!");
-    navigate({ to: "/dashboard", replace: true });
+    if (error) return toast.error(error.message);
+    toast.success("New confirmation email sent");
+    startResendTimer();
   }
 
-  if (step === "method") {
+  if (sent) {
     return (
       <PageShell>
         <div className="mx-auto max-w-md px-4 py-16">
-          <div className="rounded-lg border border-border bg-card p-7">
-            <h1 className="text-2xl font-bold">Verify Your Account</h1>
-            <p className="text-sm text-muted-foreground mt-1">Choose how you'd like to receive your 6-digit code.</p>
-            <div className="mt-6 space-y-3">
-              <button onClick={() => sendCode("email")} disabled={loading} className="w-full flex items-center gap-3 rounded-lg border border-border p-4 text-left hover:border-primary hover:bg-accent transition disabled:opacity-50">
-                <Mail className="h-5 w-5 text-primary" />
-                <div><div className="font-medium">Verify with Email</div><div className="text-xs text-muted-foreground">{form.email}</div></div>
+          <div className="rounded-lg border border-border bg-card p-7 text-center">
+            <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-primary/10">
+              <Mail className="h-7 w-7 text-primary" />
+            </div>
+            <h1 className="mt-4 text-2xl font-bold">Check Your Email</h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              We sent a confirmation link to <span className="font-medium text-foreground">{form.email}</span>.
+              Tap the <strong>Verify</strong> button in the email to activate your account.
+            </p>
+            <p className="mt-3 text-xs text-muted-foreground">
+              Can't find it? Check your spam folder.
+            </p>
+            <div className="mt-6 space-y-2">
+              <button onClick={resend} disabled={resendIn > 0 || loading} className="block w-full text-center text-sm text-primary hover:underline disabled:opacity-50">
+                {resendIn > 0 ? `Resend email in ${resendIn}s` : "Resend confirmation email"}
               </button>
-              <button onClick={() => sendCode("phone")} disabled={loading || !form.phone} className="w-full flex items-center gap-3 rounded-lg border border-border p-4 text-left hover:border-primary hover:bg-accent transition disabled:opacity-50">
-                <Phone className="h-5 w-5 text-primary" />
-                <div><div className="font-medium">Verify with Phone</div><div className="text-xs text-muted-foreground">{form.phone || "No phone number provided"}</div></div>
+              <button onClick={() => navigate({ to: "/auth" })} className="block w-full text-center text-xs text-muted-foreground hover:text-foreground">
+                Back to login
               </button>
             </div>
-            <button onClick={() => navigate({ to: "/dashboard" })} className="mt-6 text-sm text-muted-foreground hover:text-foreground">Skip for now — verify later</button>
-          </div>
-        </div>
-      </PageShell>
-    );
-  }
-
-  if (step === "verify") {
-    const dest = method === "email" ? form.email : form.phone;
-    return (
-      <PageShell>
-        <div className="mx-auto max-w-md px-4 py-16">
-          <div className="rounded-lg border border-border bg-card p-7">
-            <h1 className="text-2xl font-bold">Enter Verification Code</h1>
-            <p className="text-sm text-muted-foreground mt-1">Enter the 6-digit code sent to {dest}.</p>
-            <form onSubmit={verify} className="mt-6 space-y-4">
-              <div className="flex justify-center gap-2">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <input key={i} maxLength={1} value={otp[i] ?? ""} inputMode="numeric"
-                    onChange={(e) => {
-                      const v = e.target.value.replace(/\D/g, "");
-                      const next = (otp.slice(0, i) + v + otp.slice(i + 1)).slice(0, 6);
-                      setOtp(next);
-                      if (v && i < 5) (e.target.nextElementSibling as HTMLInputElement | null)?.focus();
-                    }}
-                    className="h-12 w-10 rounded border border-input bg-background text-center text-lg font-bold focus:border-primary focus:outline-none" />
-                ))}
-              </div>
-              <Button type="submit" className="w-full" disabled={loading}>{loading ? "Verifying..." : "Verify"}</Button>
-              <button type="button" onClick={resend} disabled={resendIn > 0} className="block w-full text-center text-sm text-primary hover:underline disabled:opacity-50">
-                {resendIn > 0 ? `Resend code in ${resendIn}s` : "Resend code"}
-              </button>
-              <button type="button" onClick={() => setStep("method")} className="block w-full text-center text-xs text-muted-foreground hover:text-foreground">Use a different method</button>
-            </form>
           </div>
         </div>
       </PageShell>

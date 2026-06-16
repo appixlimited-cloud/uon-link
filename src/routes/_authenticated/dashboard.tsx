@@ -19,13 +19,22 @@ function DashboardPage() {
 
   const profile = useQuery({
     queryKey: ["profile", user.id],
-    queryFn: async () => (await supabase.from("student_profiles").select("*").eq("user_id", user.id).maybeSingle()).data,
+    queryFn: async () => {
+      const { data } = await supabase.from("student_profiles").select("*").eq("user_id", user.id).maybeSingle();
+      // Auto-sync verification: if auth email is confirmed but profile flag isn't, fix it.
+      if (data && !data.is_verified && user.email_confirmed_at) {
+        await supabase.from("student_profiles").update({ is_verified: true }).eq("user_id", user.id);
+        return { ...data, is_verified: true };
+      }
+      return data;
+    },
   });
   const events = useQuery({ queryKey: ["events", "all"], queryFn: () => fetchPublishedEvents() });
   const myRegs = useQuery({
     queryKey: ["myRegs", user.id],
     queryFn: async () => (await supabase.from("registrations").select("*, events(*)").eq("user_id", user.id).order("created_at", { ascending: false })).data ?? [],
   });
+
 
   const interests: string[] = profile.data?.interests ?? [];
   const recommended = (events.data ?? []).filter((e) => interests.includes(e.category)).slice(0, 6);
