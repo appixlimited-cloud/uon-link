@@ -8,7 +8,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminShell,
 });
 
-const NAV = [
+const NAV: Array<{ to: any; label: string; icon: any; exact?: boolean }> = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/create-event", label: "New Event", icon: PlusCircle },
   { to: "/admin/events", label: "Events", icon: CalIcon },
@@ -23,7 +23,7 @@ const NAV = [
   { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/admin/export", label: "Export", icon: Download },
   { to: "/admin/settings", label: "Settings", icon: Settings },
-] as const;
+];
 
 function AdminShell() {
   const { user } = Route.useRouteContext();
