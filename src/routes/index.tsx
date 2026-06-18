@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { SignupForm } from "@/components/signup-form";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Calendar } from "lucide-react";
@@ -136,13 +135,6 @@ function HomePage() {
           )}
         </section>
 
-        {/* Account creation */}
-        {!user && (
-          <section className="pt-4">
-            <h2 className="text-2xl font-bold mb-4">Join UoN Link</h2>
-            <SignupForm />
-          </section>
-        )}
       </div>
     </PageShell>
   );
