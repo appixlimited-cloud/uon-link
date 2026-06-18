@@ -19,16 +19,26 @@ export type EventCardData = {
 export function EventCard({ event }: { event: EventCardData }) {
   const lowest = event.event_tickets ? lowestPrice(event.event_tickets) : null;
   const isFree = event.is_free || lowest === null;
+  const catClass = CATEGORY_COLOR[event.category] || "bg-primary text-primary-foreground";
   return (
     <article className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card transition-colors hover:border-primary/40">
-      <div className="aspect-[16/10] w-full overflow-hidden bg-muted">
+      <div className="relative w-full overflow-hidden bg-muted h-[140px] md:h-[160px]">
         {event.poster_url ? (
-          <img src={event.poster_url} alt={event.title} loading="lazy" className="h-full w-full object-cover transition-transform group-hover:scale-[1.02]" />
+          <img
+            src={event.poster_url}
+            alt={event.title}
+            loading="lazy"
+            className="h-full w-full object-cover transition-transform group-hover:scale-[1.02]"
+            onError={(e) => {
+              const img = e.currentTarget;
+              img.style.display = "none";
+              img.parentElement?.classList.add(...catClass.split(" "));
+            }}
+          />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-primary/10">
-            <span className={`text-xs px-2 py-1 rounded ${CATEGORY_COLOR[event.category] || "bg-primary text-primary-foreground"}`}>{event.category}</span>
-          </div>
+          <div className={`flex h-full w-full items-center justify-center ${catClass}`} />
         )}
+        <span className={`absolute top-2 left-2 text-xs px-2 py-1 rounded shadow ${catClass}`}>{event.category}</span>
       </div>
       <div className="flex flex-1 flex-col gap-2 p-4">
         <p className="text-xs font-bold text-primary tracking-wide">{formatEventDate(event.date)}</p>
