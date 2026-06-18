@@ -56,6 +56,7 @@ export function Navbar() {
                 <span className="grid h-7 w-7 place-items-center rounded-full bg-primary text-primary-foreground text-xs font-semibold">{initials}</span>
                 <span className="text-sm">{user.email?.split("@")[0]}</span>
               </Link>
+              <Link to="/settings"><Button size="icon" variant="ghost" aria-label="Settings"><Settings className="h-4 w-4" /></Button></Link>
               <Button size="icon" variant="ghost" onClick={signOut} aria-label="Sign out"><LogOut className="h-4 w-4" /></Button>
             </>
           ) : (
