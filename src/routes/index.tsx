@@ -26,7 +26,7 @@ export const Route = createFileRoute("/")({
 
 function HomePage() {
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("All");
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const events = useQuery({ queryKey: ["events", "home"], queryFn: () => fetchPublishedEvents({ limit: 9 }) });
   const ops = useQuery({ queryKey: ["opps", "home"], queryFn: () => fetchUpcomingOpportunities(4) });
   const spotlight = useQuery({ queryKey: ["spotlight"], queryFn: fetchActiveSpotlight });
@@ -54,7 +54,7 @@ function HomePage() {
             <Link to="/events"><Button size="lg" variant="secondary">Browse Events <ArrowRight className="ml-1.5 h-4 w-4" /></Button></Link>
             <Link to="/opportunities"><Button size="lg" variant="outline" className="bg-white/10 text-white border-white/40 hover:bg-white/20 hover:text-white backdrop-blur-sm">Opportunities</Button></Link>
           </div>
-          {!user && (
+          {!loading && !user && (
             <div className="mt-6 flex flex-wrap justify-center gap-3">
               <Link to="/signup"><Button size="lg" className="bg-white text-black hover:bg-white/90 font-semibold">Sign Up</Button></Link>
               <Link to="/auth"><Button size="lg" variant="outline" className="bg-transparent text-white border-white/40 hover:bg-white/10 hover:text-white">Log In</Button></Link>
