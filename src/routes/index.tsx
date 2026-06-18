@@ -135,13 +135,6 @@ function HomePage() {
           )}
         </section>
 
-        {/* Account creation */}
-        {!user && (
-          <section className="pt-4">
-            <h2 className="text-2xl font-bold mb-4">Join UoN Link</h2>
-            <SignupForm />
-          </section>
-        )}
       </div>
     </PageShell>
   );
