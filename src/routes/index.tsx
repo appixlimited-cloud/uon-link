@@ -26,7 +26,7 @@ export const Route = createFileRoute("/")({
 
 function HomePage() {
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("All");
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const events = useQuery({ queryKey: ["events", "home"], queryFn: () => fetchPublishedEvents({ limit: 9 }) });
   const ops = useQuery({ queryKey: ["opps", "home"], queryFn: () => fetchUpcomingOpportunities(4) });
   const spotlight = useQuery({ queryKey: ["spotlight"], queryFn: fetchActiveSpotlight });
