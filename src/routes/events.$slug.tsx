@@ -73,15 +73,22 @@ function EventDetailPage() {
     <PageShell>
       <div className="mx-auto max-w-4xl px-4 py-8">
         <Link to="/events" className="inline-flex items-center gap-1 text-sm text-primary hover:underline mb-4"><ArrowLeft className="h-4 w-4" /> Back to Events</Link>
-        <div className="aspect-[21/9] w-full overflow-hidden rounded-lg bg-muted mb-6">
-          {event.poster_url ? <img src={event.poster_url} alt={event.title} className="h-full w-full object-cover" /> : (
-            <div className="flex h-full items-center justify-center"><span className={`rounded px-3 py-1 text-sm ${CATEGORY_COLOR[event.category] || "bg-primary text-white"}`}>{event.category}</span></div>
+        <div className={`relative w-full overflow-hidden rounded-lg mb-6 h-[200px] md:h-[300px] ${CATEGORY_COLOR[event.category] || "bg-primary"}`}>
+          {event.poster_url && (
+            <img
+              src={event.poster_url}
+              alt={event.title}
+              className="h-full w-full object-cover"
+              onError={(e) => { e.currentTarget.style.display = "none"; }}
+            />
           )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 p-5">
+            <span className={`inline-block rounded px-2 py-0.5 text-xs font-semibold mb-2 ${CATEGORY_COLOR[event.category] || "bg-primary text-white"}`}>{event.category}</span>
+            <h1 className="text-2xl md:text-4xl font-bold text-white drop-shadow-lg">{event.title}</h1>
+          </div>
         </div>
-        <div className="flex items-center gap-2 mb-2">
-          <span className={`rounded px-2 py-0.5 text-xs font-semibold ${CATEGORY_COLOR[event.category] || "bg-primary text-white"}`}>{event.category}</span>
-        </div>
-        <h1 className="text-3xl md:text-4xl font-bold">{event.title}</h1>
+        <h1 className="sr-only">{event.title}</h1>
         <div className="mt-4 flex flex-wrap gap-4 text-sm text-muted-foreground">
           <span className="inline-flex items-center gap-1.5"><Calendar className="h-4 w-4" /> {formatEventDate(event.date)}</span>
           {event.time && <span className="inline-flex items-center gap-1.5"><Clock className="h-4 w-4" /> {event.time}</span>}
