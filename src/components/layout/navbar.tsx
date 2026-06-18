@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Menu, X, LogOut } from "lucide-react";
+import { Menu, X, LogOut, Settings } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -56,6 +56,7 @@ export function Navbar() {
                 <span className="grid h-7 w-7 place-items-center rounded-full bg-primary text-primary-foreground text-xs font-semibold">{initials}</span>
                 <span className="text-sm">{user.email?.split("@")[0]}</span>
               </Link>
+              <Link to="/settings"><Button size="icon" variant="ghost" aria-label="Settings"><Settings className="h-4 w-4" /></Button></Link>
               <Button size="icon" variant="ghost" onClick={signOut} aria-label="Sign out"><LogOut className="h-4 w-4" /></Button>
             </>
           ) : (
@@ -82,6 +83,7 @@ export function Navbar() {
                 <>
                   {isAdmin && <Link to="/admin" onClick={() => setOpen(false)}><Button size="sm" variant="outline" className="w-full">Admin</Button></Link>}
                   <Link to="/dashboard" onClick={() => setOpen(false)}><Button size="sm" variant="ghost" className="w-full">Dashboard</Button></Link>
+                  <Link to="/settings" onClick={() => setOpen(false)}><Button size="sm" variant="ghost" className="w-full"><Settings className="h-4 w-4 mr-2" />Settings</Button></Link>
                   <Button size="sm" onClick={() => { setOpen(false); signOut(); }} variant="outline">Sign out</Button>
                 </>
               ) : (
