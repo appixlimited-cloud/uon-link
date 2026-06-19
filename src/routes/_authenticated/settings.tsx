@@ -4,12 +4,14 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { PageShell } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/integrations/supabase/client";
 import { INTERESTS } from "@/lib/categories";
 import { toast } from "sonner";
+import { BANNER_GRADIENTS, BANNER_KEYS, AVATAR_STYLES, AVATAR_STYLE_KEYS, FRAME_THRESHOLDS, FRAME_LABEL, FRAME_RING, FrameKey, framesForStreak } from "@/lib/profile-customization";
+import { UserAvatar } from "@/components/user-avatar";
+import { computeStreak } from "@/lib/streak";
+import { Lock } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({ meta: [{ title: "Settings — UoN Link" }] }),
