@@ -1,71 +1,65 @@
-# UoN Link — Homepage & Social Features
+This is a large, multi-phase build. I'll ship it in ordered phases so you see progress quickly and can course-correct between phases.
 
-Large multi-part build. I'll ship it in 6 cohesive units. Nothing outside these areas changes.
+## Phase 0 — Backend setup
+- Enable Lovable Cloud (Supabase).
+- Create tables: events, event_tickets, registrations, student_profiles, opportunities, notices, clubs, spotlights, app_config, newsletter_subscribers, admin_notifications.
+- Create roles table (`user_roles` + `has_role` function) — admin identified by role, not by hardcoded email check in code (more secure; we'll seed admin role for appixlimited@gmail.com on first signup).
+- RLS policies: public read on published content; admin write; students read/write their own profile + registrations.
+- Storage buckets: event-posters (public), club-logos (public), profile-pictures (authenticated, owner-only).
+- Seed empty app_config row with app_enabled=true.
 
-## 1. Bento grid homepage + dashboard
-- New `BentoFeatured` section above existing events list on `/` and `/dashboard`.
-  - Left card (1.4fr, spans 2 rows): top featured event (or most-registered upcoming). Category gradient bg, category badge, date, title, who's-going avatars, price badge bottom-right. Links to event detail.
-  - Right column (1fr, 2 stacked cards):
-    - Opportunities card: open count + "X closing this week".
-    - Streak card: 🔥 icon, current streak (derived from `registrations.created_at` consecutive-day activity), motivational microcopy. On homepage when logged-out, this card becomes "Join UoN Link" CTA.
-- Mobile: stacks vertically (featured first, then 2-col stat cards).
+## Phase 1 — Design system & shell
+- Tailwind tokens in `src/styles.css`: primary #185FA5, white bg, flat (no gradients/heavy shadows).
+- Top navbar (logo, center links, login/signup or profile), mobile hamburger.
+- Footer (3 columns with contact appixlimited@gmail.com).
+- Kill switch: root layout checks app_config; if disabled, show maintenance page (admins bypass).
 
-## 2. Campus Mood badge
-- New table `public.campus_mood` (id, message, emoji, start_date, end_date, is_active, created_at, updated_at) + RLS + GRANTs.
-  - Public SELECT for active rows; admin full access via `has_role(...,'admin')`.
-- Top of `/` and `/dashboard` (just under navbar): pill badge, purple→blue gradient, shows active mood (date range match wins; else most-recently-activated). Hidden if none.
-- Admin page `/admin/campus-mood`: list + create/edit/activate with date range.
+## Phase 2 — Public pages
+- `/` homepage (hero, spotlight, filter chips, events grid, opportunities closing soon).
+- `/events`, `/career-events`, `/uni-vibe` (category-filtered listings with search).
+- `/events/$slug` detail page (poster, tiered ticket cards, Register with tier selector, WhatsApp share, Google Calendar link).
+- `/calendar` (monthly grid + list view toggle, color legend, Google Calendar export per event).
+- `/opportunities`, `/notices` (grouped by category), `/clubs` (searchable directory).
+- `/about`, `/contact`, `/privacy`, `/terms`, `/support`.
 
-## 3. Live "who's going" social proof
-- New `<WhosGoing eventId />` component used on every event card and event detail page.
-- Query: 3 most recent registrants joined to `student_profiles` (name + avatar_url + is_private) + total count.
-- Render rules exactly as specified (0 → hidden or "Be the first"; 1 → "X is going"; 2 → "X and Y are going"; 3+ → avatar stack + "X, Y +N going"). Private profiles counted but unnamed.
-- Realtime: subscribe to `registrations` filtered by `event_id`; invalidate the query on insert/delete. One channel per mounted component, cleaned up on unmount.
-- Requires `student_profiles.is_private` column and a public SELECT policy for safe columns (full_name, avatar_url, is_private) so the join works under RLS. I'll add both in the migration.
+## Phase 3 — Auth & student area
+- `/auth` (admin + student login).
+- `/signup` with full field set; on submit → verification step (email OTP via Supabase, or phone OTP). 6-box code input, resend after 60s. Sets `is_verified`.
+- `/_authenticated/dashboard` — personalized by interests, verification banner.
+- `/_authenticated/profile` — avatar upload to profile-pictures bucket, registered events with ticket tier.
+- `/_authenticated/settings` — appearance (light/dark in localStorage), account, notifications toggles, interests, delete account (type DELETE).
+- Register-for-event flow writes to `registrations` with chosen `ticket_tier`.
 
-## 4. Register button with full confirmation state
-- Refactor register flow into shared `<RegisterButton event />` used by `EventCard` and `events.$slug.tsx`.
-- States: idle → loading (spinner, disabled) → registered (green pill + check, disabled). Pre-checks `registrations` for `(user_id, event_id)` on mount so no flicker.
-- Success: toast "You're registered for [Event]! Check your email for your QR code." + optimistic add to who's-going stack via query invalidation.
-- Failure: revert + error toast.
-- Unverified profile: button shows "Please verify your account first" linking to `/settings`.
-- Logged-out: keeps existing "Sign in to register" behavior.
+## Phase 4 — Admin (gated by admin role)
+- `/admin` dashboard (4 stat cards, recent events table).
+- `/admin/create-event` + edit: poster upload tabs (drag-drop with preview OR paste URL with live preview), Free/Paid toggle, three independent tier sections (Regular/VIP/VVIP) writing to `event_tickets`.
+- `/admin/calendar` (published blue, draft grey, click-to-create).
+- `/admin/opportunities`, `/admin/notices`, `/admin/clubs` (with logo upload).
+- `/admin/students` (table + CSV export).
+- `/admin/registrations` (grouped by event, ticket tier column, CSV per event).
+- `/admin/featured` (pick up to 5, drag-reorder).
+- `/admin/spotlight` (photo upload, publish date).
+- `/admin/analytics` (counts, top faculties, tier breakdown, bar chart of last 5 events).
+- `/admin/export` (CSV downloads).
+- `/admin/settings` (kill switch, contact config).
 
-## 5. Profile customization
-- Migration adds to `student_profiles`: `banner_color text`, `avatar_style text`, `unlocked_frames text[] default '{}'`, `active_frame text`, `is_private boolean default false`.
-- `/settings` gains "Customize Profile" section:
-  - 6 gradient banner swatches.
-  - 6 avatar styles (used only when no `avatar_url`).
-  - Frame picker showing locked/unlocked state based on current streak (bronze 7 / silver 14 / gold 30 / animated 60).
-- `Avatar` helper component renders picture or styled initials, with optional frame ring + banner. Used in navbar dropdown, dashboard header, profile page, and who's-going stack.
+## Phase 5 — Polish
+- Null-safe empty states everywhere ("No events posted yet. Check back soon!" etc.).
+- All upload calls wrapped in try/catch with toast errors.
+- WhatsApp share uses `https://wa.me/?text=` with target=_blank rel=noopener.
+- Sitemap.xml + robots.txt for public routes.
+- SEO `head()` on every public route.
 
-## 6. Where things change
-**New files**
-- `src/components/bento-featured.tsx`
-- `src/components/campus-mood-badge.tsx`
-- `src/components/whos-going.tsx`
-- `src/components/register-button.tsx`
-- `src/components/user-avatar.tsx` (with frame + style support)
-- `src/lib/streak.ts` (compute streak from registrations)
-- `src/routes/_authenticated/admin/campus-mood.tsx`
+## Technical notes
+- Stack: TanStack Start + React 19, Tailwind v4, shadcn, Lovable Cloud (Supabase).
+- Auth: Supabase email/password + email OTP + phone OTP. Admin role via `user_roles` table + `has_role()` — NOT a hardcoded email check (the spec's email check is implemented as "auto-grant admin role to appixlimited@gmail.com on first signup", which is safer).
+- Routing: file-based under `src/routes/`; protected pages live under `src/routes/_authenticated/` (integration-managed gate). Admin pages under `src/routes/_authenticated/admin/` with an extra role check.
+- Data reads: TanStack Query + `useSuspenseQuery` in components, `ensureQueryData` in loaders for public pages.
+- No seed/placeholder data anywhere — all content starts empty.
 
-**Edited files**
-- `src/routes/index.tsx`, `src/routes/_authenticated/dashboard.tsx` — bento + mood badge.
-- `src/components/event-card.tsx`, `src/routes/events.$slug.tsx` — who's-going + new register button.
-- `src/routes/_authenticated/settings.tsx` — customization section.
-- `src/components/layout/navbar.tsx` — avatar with banner/frame.
-- `src/routes/_authenticated/admin/route.tsx` (or nav) — link to campus mood admin.
+## Scope confirmation
+Given the size (~30 routes, 11 tables, 3 buckets, OTP verification, file uploads, CSV exports, analytics, kill switch), this will take several turns. I'll start with Phase 0+1 (backend + shell + design system + navbar/footer) in the next turn so you can see the foundation, then proceed phase by phase.
 
-## 7. Database (one migration)
-- Create `campus_mood` table + RLS + GRANTs (anon SELECT active rows, admin full access).
-- Add columns to `student_profiles`: `banner_color`, `avatar_style`, `unlocked_frames`, `active_frame`, `is_private`.
-- Add narrow public SELECT policy on `student_profiles` for `(user_id, full_name, avatar_url, is_private, active_frame, avatar_style)` exposure needed by who's-going.
-- Add `registrations` to `supabase_realtime` publication.
-- Seed 4 example mood rows (inactive, dated examples) so admin can activate.
-
-## 8. Out of scope (won't touch)
-- Existing styling/colors/layout outside the sections above.
-- Backend logic for ticketing, QR emails, or any other table.
-- Any change to `events`/`registrations` schema beyond the realtime publication.
-
-Approve and I'll execute the migration first, then build the UI in parallel batches.
+**Two quick decisions before I start:**
+1. Admin identification — OK to use a `user_roles` table where appixlimited@gmail.com is auto-granted admin on signup (safer than email-string checks)? Or strictly hardcode the email check as written?
+2. Phone OTP requires Supabase SMS provider configuration (Twilio/MessageBird) with your own credentials — Lovable Cloud doesn't ship SMS by default. OK to ship email OTP now and stub phone OTP with a "coming soon" notice until you add SMS credentials?

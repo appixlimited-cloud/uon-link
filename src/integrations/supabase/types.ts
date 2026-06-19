@@ -59,39 +59,6 @@ export type Database = {
         }
         Relationships: []
       }
-      campus_mood: {
-        Row: {
-          created_at: string
-          emoji: string
-          end_date: string | null
-          id: string
-          is_active: boolean
-          message: string
-          start_date: string | null
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          emoji?: string
-          end_date?: string | null
-          id?: string
-          is_active?: boolean
-          message: string
-          start_date?: string | null
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          emoji?: string
-          end_date?: string | null
-          id?: string
-          is_active?: boolean
-          message?: string
-          start_date?: string | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
       clubs: {
         Row: {
           category: string | null
@@ -398,55 +365,40 @@ export type Database = {
       }
       student_profiles: {
         Row: {
-          active_frame: string | null
-          avatar_style: string | null
           avatar_url: string | null
-          banner_color: string | null
           created_at: string
           faculty: string | null
           full_name: string
           interests: string[] | null
-          is_private: boolean
           is_verified: boolean
           phone: string | null
           registration_number: string | null
-          unlocked_frames: string[]
           updated_at: string
           user_id: string
           year_of_study: string | null
         }
         Insert: {
-          active_frame?: string | null
-          avatar_style?: string | null
           avatar_url?: string | null
-          banner_color?: string | null
           created_at?: string
           faculty?: string | null
           full_name: string
           interests?: string[] | null
-          is_private?: boolean
           is_verified?: boolean
           phone?: string | null
           registration_number?: string | null
-          unlocked_frames?: string[]
           updated_at?: string
           user_id: string
           year_of_study?: string | null
         }
         Update: {
-          active_frame?: string | null
-          avatar_style?: string | null
           avatar_url?: string | null
-          banner_color?: string | null
           created_at?: string
           faculty?: string | null
           full_name?: string
           interests?: string[] | null
-          is_private?: boolean
           is_verified?: boolean
           phone?: string | null
           registration_number?: string | null
-          unlocked_frames?: string[]
           updated_at?: string
           user_id?: string
           year_of_study?: string | null

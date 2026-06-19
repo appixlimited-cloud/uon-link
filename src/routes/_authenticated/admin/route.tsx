@@ -20,7 +20,6 @@ const NAV: Array<{ to: any; label: string; icon: any; exact?: boolean }> = [
   { to: "/admin/calendar", label: "Calendar", icon: CalIcon },
   { to: "/admin/featured", label: "Featured", icon: Star },
   { to: "/admin/spotlight", label: "Spotlight", icon: Sparkles },
-  { to: "/admin/campus-mood", label: "Campus Mood", icon: Sparkles },
   { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/admin/export", label: "Export", icon: Download },
   { to: "/admin/settings", label: "Settings", icon: Settings },
