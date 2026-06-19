@@ -8,6 +8,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { fetchPublishedEvents } from "@/lib/db/queries";
 import { formatShortDate } from "@/lib/format";
 import { AlertCircle } from "lucide-react";
+import { CampusMoodBadge } from "@/components/campus-mood-badge";
+import { BentoFeatured } from "@/components/bento-featured";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — UoN Link" }] }),
@@ -42,8 +44,14 @@ function DashboardPage() {
 
   return (
     <PageShell>
+      <CampusMoodBadge />
       <div className="mx-auto max-w-7xl px-4 py-10 space-y-8">
         <header>
+          <h1 className="text-3xl font-bold">Welcome back{profile.data?.full_name ? `, ${profile.data.full_name.split(" ")[0]}` : ""} 👋</h1>
+          <p className="text-muted-foreground mt-1">Here's what's happening on campus.</p>
+        </header>
+
+        <BentoFeatured />
           <h1 className="text-3xl font-bold">Welcome back{profile.data?.full_name ? `, ${profile.data.full_name.split(" ")[0]}` : ""} 👋</h1>
           <p className="text-muted-foreground mt-1">Here's what's happening on campus.</p>
         </header>
