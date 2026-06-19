@@ -52,9 +52,6 @@ function DashboardPage() {
         </header>
 
         <BentoFeatured />
-          <h1 className="text-3xl font-bold">Welcome back{profile.data?.full_name ? `, ${profile.data.full_name.split(" ")[0]}` : ""} 👋</h1>
-          <p className="text-muted-foreground mt-1">Here's what's happening on campus.</p>
-        </header>
 
         {profile.data && !profile.data.is_verified && (
           <div className="flex items-center justify-between gap-3 rounded-lg border border-warning bg-warning/10 p-4">
