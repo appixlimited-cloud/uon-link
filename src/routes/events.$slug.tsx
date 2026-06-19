@@ -81,16 +81,13 @@ function EventDetailPage() {
           )}
         </section>
 
-        <div className="mt-6 flex flex-wrap gap-3">
-          {existing ? (
-            <Button disabled size="lg" variant="outline">✓ Registered as {existing.ticket_tier}</Button>
-          ) : user ? (
-            <Button size="lg" onClick={() => register.mutate()} disabled={register.isPending || (!isFree && !tier)}>{register.isPending ? "Registering..." : "Register"}</Button>
-          ) : (
-            <Link to="/auth"><Button size="lg">Sign in to register</Button></Link>
-          )}
-          <a href={whatsappShare(shareText)} target="_blank" rel="noopener noreferrer"><Button size="lg" variant="outline"><Share2 className="h-4 w-4 mr-1.5" /> Share on WhatsApp</Button></a>
-          <a href={googleCalUrl({ title: event.title, date: event.date, time: event.time, venue: event.venue, description: event.description })} target="_blank" rel="noopener noreferrer"><Button size="lg" variant="outline"><Calendar className="h-4 w-4 mr-1.5" /> Add to Google Calendar</Button></a>
+        <div className="mt-6 space-y-3">
+          <WhosGoing eventId={event.id} size="md" showZero />
+          <div className="flex flex-wrap gap-3">
+            <RegisterButton eventId={event.id} eventTitle={event.title} ticketTier={isFree ? "Free" : tier || null} size="lg" />
+            <a href={whatsappShare(shareText)} target="_blank" rel="noopener noreferrer"><Button size="lg" variant="outline"><Share2 className="h-4 w-4 mr-1.5" /> Share on WhatsApp</Button></a>
+            <a href={googleCalUrl({ title: event.title, date: event.date, time: event.time, venue: event.venue, description: event.description })} target="_blank" rel="noopener noreferrer"><Button size="lg" variant="outline"><Calendar className="h-4 w-4 mr-1.5" /> Add to Google Calendar</Button></a>
+          </div>
         </div>
       </div>
     </PageShell>
