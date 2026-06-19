@@ -79,6 +79,24 @@ function SettingsPage() {
     navigate({ to: "/", replace: true });
   }
 
+  // Customization
+  const streakQuery = useQuery({
+    queryKey: ["streak", user.id],
+    queryFn: async () => {
+      const { data } = await supabase.from("registrations").select("created_at").eq("user_id", user.id);
+      return computeStreak((data ?? []).map((r) => r.created_at));
+    },
+  });
+  const streak = streakQuery.data ?? 0;
+  const unlocked = framesForStreak(streak);
+
+  async function saveCustomization(patch: Record<string, any>) {
+    const { error } = await supabase.from("student_profiles").update(patch).eq("user_id", user.id);
+    if (error) return toast.error(error.message);
+    toast.success("Profile updated");
+    qc.invalidateQueries({ queryKey: ["profile", user.id] });
+  }
+
   return (
     <PageShell>
       <div className="mx-auto max-w-3xl px-4 py-10 space-y-8">
