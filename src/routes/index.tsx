@@ -9,8 +9,10 @@ import { EmptyState } from "@/components/empty-state";
 import { useAuth } from "@/hooks/use-auth";
 import towerAsset from "@/assets/uon-tower.png.asset.json";
 import { fetchPublishedEvents, fetchUpcomingOpportunities, fetchActiveSpotlight } from "@/lib/db/queries";
-import { CATEGORY_COLOR, OPPORTUNITY_TYPE_COLOR } from "@/lib/categories";
+import { OPPORTUNITY_TYPE_COLOR } from "@/lib/categories";
 import { formatShortDate, daysUntil } from "@/lib/format";
+import { CampusMoodBadge } from "@/components/campus-mood-badge";
+import { BentoFeatured } from "@/components/bento-featured";
 
 const FILTERS = ["All", "Academic", "Career", "Tech", "Sports", "Uni Vibe", "Free"] as const;
 
@@ -39,6 +41,7 @@ function HomePage() {
 
   return (
     <PageShell>
+      <CampusMoodBadge />
       {/* Hero with campus background */}
       <section
         className="relative isolate overflow-hidden text-white"
@@ -64,6 +67,7 @@ function HomePage() {
       </section>
 
       <div className="mx-auto max-w-7xl px-4 py-12 space-y-14">
+        <BentoFeatured />
         {/* Spotlight */}
         <section>
           <h2 className="text-2xl font-bold mb-4">Student Spotlight</h2>
