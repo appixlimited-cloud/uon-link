@@ -1,10 +1,13 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Menu, X, LogOut, Settings } from "lucide-react";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useQueryClient } from "@tanstack/react-query";
+import { UserAvatar } from "@/components/user-avatar";
+import { BANNER_GRADIENTS } from "@/lib/profile-customization";
 
 const NAV_LINKS = [
   { to: "/", label: "Home" },
@@ -25,7 +28,12 @@ export function Navbar() {
   const navigate = useNavigate();
   const qc = useQueryClient();
 
-  const initials = user?.email?.slice(0, 2).toUpperCase() ?? "U";
+  const profile = useQuery({
+    queryKey: ["profile", user?.id],
+    enabled: !!user,
+    queryFn: async () => (await supabase.from("student_profiles").select("full_name, avatar_url, avatar_style, active_frame, banner_color").eq("user_id", user!.id).maybeSingle()).data,
+  });
+  const bannerClass = profile.data?.banner_color ? BANNER_GRADIENTS[profile.data.banner_color] : "";
 
   async function signOut() {
     await qc.cancelQueries();
@@ -52,9 +60,9 @@ export function Navbar() {
           {user ? (
             <>
               {isAdmin && <Link to="/admin"><Button size="sm" variant="outline">Admin</Button></Link>}
-              <Link to="/dashboard" className="flex items-center gap-2 rounded px-2 py-1 hover:bg-accent">
-                <span className="grid h-7 w-7 place-items-center rounded-full bg-primary text-primary-foreground text-xs font-semibold">{initials}</span>
-                <span className="text-sm">{user.email?.split("@")[0]}</span>
+              <Link to="/dashboard" className={`flex items-center gap-2 rounded-full pl-1 pr-3 py-1 hover:opacity-90 ${bannerClass}`}>
+                <UserAvatar size="sm" name={profile.data?.full_name} email={user.email} avatarUrl={profile.data?.avatar_url} avatarStyle={profile.data?.avatar_style} activeFrame={profile.data?.active_frame} />
+                <span className={`text-sm ${bannerClass ? "text-white" : ""}`}>{profile.data?.full_name?.split(" ")[0] ?? user.email?.split("@")[0]}</span>
               </Link>
               <Link to="/settings"><Button size="icon" variant="ghost" aria-label="Settings"><Settings className="h-4 w-4" /></Button></Link>
               <Button size="icon" variant="ghost" onClick={signOut} aria-label="Sign out"><LogOut className="h-4 w-4" /></Button>

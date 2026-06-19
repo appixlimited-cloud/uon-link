@@ -1,8 +1,9 @@
 import { Link } from "@tanstack/react-router";
-import { MapPin, Calendar } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { MapPin } from "lucide-react";
 import { formatEventDate, lowestPrice } from "@/lib/format";
 import { CATEGORY_COLOR } from "@/lib/categories";
+import { WhosGoing } from "@/components/whos-going";
+import { RegisterButton } from "@/components/register-button";
 
 export type EventCardData = {
   id: string;
@@ -22,7 +23,7 @@ export function EventCard({ event }: { event: EventCardData }) {
   const catClass = CATEGORY_COLOR[event.category] || "bg-primary text-primary-foreground";
   return (
     <article className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card transition-colors hover:border-primary/40">
-      <div className="relative w-full overflow-hidden bg-muted h-[140px] md:h-[160px]">
+      <Link to="/events/$slug" params={{ slug: event.slug }} className="relative w-full overflow-hidden bg-muted h-[140px] md:h-[160px] block">
         {event.poster_url ? (
           <img
             src={event.poster_url}
@@ -39,7 +40,7 @@ export function EventCard({ event }: { event: EventCardData }) {
           <div className={`flex h-full w-full items-center justify-center ${catClass}`} />
         )}
         <span className={`absolute top-2 left-2 text-xs px-2 py-1 rounded shadow ${catClass}`}>{event.category}</span>
-      </div>
+      </Link>
       <div className="flex flex-1 flex-col gap-2 p-4">
         <p className="text-xs font-bold text-primary tracking-wide">{formatEventDate(event.date)}</p>
         <h3 className="line-clamp-2 text-base font-semibold">{event.title}</h3>
@@ -47,15 +48,14 @@ export function EventCard({ event }: { event: EventCardData }) {
           <MapPin className="h-3.5 w-3.5" />
           <span className="line-clamp-1">{event.venue || "Venue TBA"}</span>
         </div>
-        <div className="mt-auto flex items-center justify-between pt-3">
+        <WhosGoing eventId={event.id} size="xs" />
+        <div className="mt-auto flex items-center justify-between pt-3 gap-2">
           {isFree ? (
             <span className="rounded-md bg-success px-2 py-1 text-xs font-semibold text-success-foreground">FREE</span>
           ) : (
             <span className="rounded-md bg-primary px-2 py-1 text-xs font-semibold text-primary-foreground">KSh {Number(lowest).toLocaleString()}</span>
           )}
-          <Link to="/events/$slug" params={{ slug: event.slug }}>
-            <Button size="sm">Register</Button>
-          </Link>
+          <RegisterButton eventId={event.id} eventTitle={event.title} ticketTier={isFree ? "Free" : null} />
         </div>
       </div>
     </article>

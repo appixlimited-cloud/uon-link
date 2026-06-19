@@ -42,6 +42,7 @@ import { Route as AuthenticatedAdminExportRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminEventsRouteImport } from './routes/_authenticated/admin/events'
 import { Route as AuthenticatedAdminCreateEventRouteImport } from './routes/_authenticated/admin/create-event'
 import { Route as AuthenticatedAdminClubsRouteImport } from './routes/_authenticated/admin/clubs'
+import { Route as AuthenticatedAdminCampusMoodRouteImport } from './routes/_authenticated/admin/campus-mood'
 import { Route as AuthenticatedAdminCalendarRouteImport } from './routes/_authenticated/admin/calendar'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
 import { Route as AuthenticatedAdminEventsIdRouteImport } from './routes/_authenticated/admin/events.$id'
@@ -220,6 +221,12 @@ const AuthenticatedAdminClubsRoute = AuthenticatedAdminClubsRouteImport.update({
   path: '/clubs',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const AuthenticatedAdminCampusMoodRoute =
+  AuthenticatedAdminCampusMoodRouteImport.update({
+    id: '/campus-mood',
+    path: '/campus-mood',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminCalendarRoute =
   AuthenticatedAdminCalendarRouteImport.update({
     id: '/calendar',
@@ -262,6 +269,7 @@ export interface FileRoutesByFullPath {
   '/events/$slug': typeof EventsSlugRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/calendar': typeof AuthenticatedAdminCalendarRoute
+  '/admin/campus-mood': typeof AuthenticatedAdminCampusMoodRoute
   '/admin/clubs': typeof AuthenticatedAdminClubsRoute
   '/admin/create-event': typeof AuthenticatedAdminCreateEventRoute
   '/admin/events': typeof AuthenticatedAdminEventsRouteWithChildren
@@ -298,6 +306,7 @@ export interface FileRoutesByTo {
   '/events/$slug': typeof EventsSlugRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/calendar': typeof AuthenticatedAdminCalendarRoute
+  '/admin/campus-mood': typeof AuthenticatedAdminCampusMoodRoute
   '/admin/clubs': typeof AuthenticatedAdminClubsRoute
   '/admin/create-event': typeof AuthenticatedAdminCreateEventRoute
   '/admin/events': typeof AuthenticatedAdminEventsRouteWithChildren
@@ -337,6 +346,7 @@ export interface FileRoutesById {
   '/events/$slug': typeof EventsSlugRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/calendar': typeof AuthenticatedAdminCalendarRoute
+  '/_authenticated/admin/campus-mood': typeof AuthenticatedAdminCampusMoodRoute
   '/_authenticated/admin/clubs': typeof AuthenticatedAdminClubsRoute
   '/_authenticated/admin/create-event': typeof AuthenticatedAdminCreateEventRoute
   '/_authenticated/admin/events': typeof AuthenticatedAdminEventsRouteWithChildren
@@ -376,6 +386,7 @@ export interface FileRouteTypes {
     | '/events/$slug'
     | '/admin/analytics'
     | '/admin/calendar'
+    | '/admin/campus-mood'
     | '/admin/clubs'
     | '/admin/create-event'
     | '/admin/events'
@@ -412,6 +423,7 @@ export interface FileRouteTypes {
     | '/events/$slug'
     | '/admin/analytics'
     | '/admin/calendar'
+    | '/admin/campus-mood'
     | '/admin/clubs'
     | '/admin/create-event'
     | '/admin/events'
@@ -450,6 +462,7 @@ export interface FileRouteTypes {
     | '/events/$slug'
     | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/calendar'
+    | '/_authenticated/admin/campus-mood'
     | '/_authenticated/admin/clubs'
     | '/_authenticated/admin/create-event'
     | '/_authenticated/admin/events'
@@ -717,6 +730,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminClubsRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/campus-mood': {
+      id: '/_authenticated/admin/campus-mood'
+      path: '/campus-mood'
+      fullPath: '/admin/campus-mood'
+      preLoaderRoute: typeof AuthenticatedAdminCampusMoodRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/calendar': {
       id: '/_authenticated/admin/calendar'
       path: '/calendar'
@@ -758,6 +778,7 @@ const AuthenticatedAdminEventsRouteWithChildren =
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminAnalyticsRoute: typeof AuthenticatedAdminAnalyticsRoute
   AuthenticatedAdminCalendarRoute: typeof AuthenticatedAdminCalendarRoute
+  AuthenticatedAdminCampusMoodRoute: typeof AuthenticatedAdminCampusMoodRoute
   AuthenticatedAdminClubsRoute: typeof AuthenticatedAdminClubsRoute
   AuthenticatedAdminCreateEventRoute: typeof AuthenticatedAdminCreateEventRoute
   AuthenticatedAdminEventsRoute: typeof AuthenticatedAdminEventsRouteWithChildren
@@ -776,6 +797,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
   {
     AuthenticatedAdminAnalyticsRoute: AuthenticatedAdminAnalyticsRoute,
     AuthenticatedAdminCalendarRoute: AuthenticatedAdminCalendarRoute,
+    AuthenticatedAdminCampusMoodRoute: AuthenticatedAdminCampusMoodRoute,
     AuthenticatedAdminClubsRoute: AuthenticatedAdminClubsRoute,
     AuthenticatedAdminCreateEventRoute: AuthenticatedAdminCreateEventRoute,
     AuthenticatedAdminEventsRoute: AuthenticatedAdminEventsRouteWithChildren,

@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { ArrowLeft, Calendar, Clock, MapPin, Share2 } from "lucide-react";
 import { PageShell } from "@/components/layout/page-shell";
@@ -7,9 +7,8 @@ import { Button } from "@/components/ui/button";
 import { fetchEventBySlug } from "@/lib/db/queries";
 import { formatEventDate, googleCalUrl, whatsappShare, lowestPrice } from "@/lib/format";
 import { CATEGORY_COLOR } from "@/lib/categories";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/use-auth";
-import { toast } from "sonner";
+import { RegisterButton } from "@/components/register-button";
+import { WhosGoing } from "@/components/whos-going";
 
 export const Route = createFileRoute("/events/$slug")({
   component: EventDetailPage,
@@ -17,51 +16,13 @@ export const Route = createFileRoute("/events/$slug")({
 
 function EventDetailPage() {
   const { slug } = Route.useParams();
-  const navigate = Route.useNavigate?.() ?? (() => {});
-  const { user } = useAuth();
-  const qc = useQueryClient();
   const [tier, setTier] = useState<string>("");
 
   const { data: event, isLoading } = useQuery({ queryKey: ["event", slug], queryFn: () => fetchEventBySlug(slug) });
-  const { data: existing } = useQuery({
-    queryKey: ["registration", slug, user?.id],
-    queryFn: async () => {
-      if (!user || !event) return null;
-      const { data } = await supabase.from("registrations").select("*").eq("event_id", event.id).eq("user_id", user.id).maybeSingle();
-      return data;
-    },
-    enabled: !!user && !!event,
-  });
 
   const tickets = (event?.event_tickets ?? []).filter((t: any) => t.is_enabled);
   const lowest = lowestPrice(event?.event_tickets ?? []);
   const isFree = event?.is_free || lowest === null;
-
-  const register = useMutation({
-    mutationFn: async () => {
-      if (!user) throw new Error("Please sign in");
-      if (!event) throw new Error("Event not found");
-      if (!isFree && !tier) throw new Error("Please select a ticket tier");
-      const { data: profile } = await supabase.from("student_profiles").select("*").eq("user_id", user.id).maybeSingle();
-      if (!profile?.is_verified) throw new Error("Please verify your account before registering");
-      const { error } = await supabase.from("registrations").insert({
-        event_id: event.id,
-        user_id: user.id,
-        student_name: profile.full_name,
-        email: user.email!,
-        registration_number: profile.registration_number,
-        faculty: profile.faculty,
-        year_of_study: profile.year_of_study,
-        ticket_tier: isFree ? "Free" : tier,
-      });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Registered! See you there.");
-      qc.invalidateQueries({ queryKey: ["registration", slug] });
-    },
-    onError: (e: any) => toast.error(e.message ?? "Could not register"),
-  });
 
   if (isLoading) return <PageShell><div className="mx-auto max-w-4xl px-4 py-10">Loading...</div></PageShell>;
   if (!event) return <PageShell><div className="mx-auto max-w-4xl px-4 py-10"><Link to="/events" className="text-primary">← Back to events</Link><h1 className="text-2xl font-bold mt-4">Event not found</h1></div></PageShell>;
@@ -120,16 +81,13 @@ function EventDetailPage() {
           )}
         </section>
 
-        <div className="mt-6 flex flex-wrap gap-3">
-          {existing ? (
-            <Button disabled size="lg" variant="outline">✓ Registered as {existing.ticket_tier}</Button>
-          ) : user ? (
-            <Button size="lg" onClick={() => register.mutate()} disabled={register.isPending || (!isFree && !tier)}>{register.isPending ? "Registering..." : "Register"}</Button>
-          ) : (
-            <Link to="/auth"><Button size="lg">Sign in to register</Button></Link>
-          )}
-          <a href={whatsappShare(shareText)} target="_blank" rel="noopener noreferrer"><Button size="lg" variant="outline"><Share2 className="h-4 w-4 mr-1.5" /> Share on WhatsApp</Button></a>
-          <a href={googleCalUrl({ title: event.title, date: event.date, time: event.time, venue: event.venue, description: event.description })} target="_blank" rel="noopener noreferrer"><Button size="lg" variant="outline"><Calendar className="h-4 w-4 mr-1.5" /> Add to Google Calendar</Button></a>
+        <div className="mt-6 space-y-3">
+          <WhosGoing eventId={event.id} size="md" showZero />
+          <div className="flex flex-wrap gap-3">
+            <RegisterButton eventId={event.id} eventTitle={event.title} ticketTier={isFree ? "Free" : tier || null} size="lg" />
+            <a href={whatsappShare(shareText)} target="_blank" rel="noopener noreferrer"><Button size="lg" variant="outline"><Share2 className="h-4 w-4 mr-1.5" /> Share on WhatsApp</Button></a>
+            <a href={googleCalUrl({ title: event.title, date: event.date, time: event.time, venue: event.venue, description: event.description })} target="_blank" rel="noopener noreferrer"><Button size="lg" variant="outline"><Calendar className="h-4 w-4 mr-1.5" /> Add to Google Calendar</Button></a>
+          </div>
         </div>
       </div>
     </PageShell>
