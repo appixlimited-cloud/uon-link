@@ -10,6 +10,16 @@ export const Route = createFileRoute("/_authenticated/admin/")({
 });
 
 function AdminDashboard() {
+  const qc = useQueryClient();
+  useEffect(() => {
+    const ch = supabase
+      .channel("admin-regs")
+      .on("postgres_changes", { event: "*", schema: "public", table: "registrations" }, () => {
+        qc.invalidateQueries({ queryKey: ["admin"] });
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [qc]);
   const stats = useQuery({
     queryKey: ["admin", "stats"],
     queryFn: async () => {
