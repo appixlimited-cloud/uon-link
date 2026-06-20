@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { PageShell } from "@/components/layout/page-shell";
 import { EventCard } from "@/components/event-card";
+import { BentoGrid } from "@/components/bento-grid";
 import { EmptyState } from "@/components/empty-state";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -78,9 +79,14 @@ function DashboardPage() {
           {recommended.length === 0 ? (
             <EmptyState title="No matching events yet" description="Update your interests in settings to see personalised events." />
           ) : (
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {recommended.map((e) => <EventCard key={e.id} event={e} />)}
-            </div>
+            <>
+              <BentoGrid events={recommended} />
+              {recommended.length > 1 && (
+                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 mt-6">
+                  {recommended.slice(1).map((e) => <EventCard key={e.id} event={e} />)}
+                </div>
+              )}
+            </>
           )}
         </section>
 
