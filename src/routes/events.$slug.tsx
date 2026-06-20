@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { ArrowLeft, Calendar, Clock, MapPin, Share2 } from "lucide-react";
+import { ArrowLeft, Calendar, Check, Clock, Loader2, MapPin, Share2 } from "lucide-react";
 import { PageShell } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
 import { fetchEventBySlug } from "@/lib/db/queries";
@@ -43,7 +43,11 @@ function EventDetailPage() {
       if (!event) throw new Error("Event not found");
       if (!isFree && !tier) throw new Error("Please select a ticket tier");
       const { data: profile } = await supabase.from("student_profiles").select("*").eq("user_id", user.id).maybeSingle();
-      if (!profile?.is_verified) throw new Error("Please verify your account before registering");
+      if (!profile?.is_verified) {
+        const err: any = new Error("Please verify your account first.");
+        err.code = "UNVERIFIED";
+        throw err;
+      }
       const { error } = await supabase.from("registrations").insert({
         event_id: event.id,
         user_id: user.id,
@@ -57,10 +61,19 @@ function EventDetailPage() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Registered! See you there.");
+      toast.success("You're in! Check your email for your QR code.");
       qc.invalidateQueries({ queryKey: ["registration", slug] });
+      qc.invalidateQueries({ queryKey: ["myRegistrations"] });
     },
-    onError: (e: any) => toast.error(e.message ?? "Could not register"),
+    onError: (e: any) => {
+      if (e?.code === "UNVERIFIED") {
+        toast.error("Please verify your account first.", {
+          action: { label: "Settings", onClick: () => navigate({ to: "/settings" }) },
+        });
+      } else {
+        toast.error("Registration failed. Please try again.");
+      }
+    },
   });
 
   if (isLoading) return <PageShell><div className="mx-auto max-w-4xl px-4 py-10">Loading...</div></PageShell>;
@@ -122,9 +135,13 @@ function EventDetailPage() {
 
         <div className="mt-6 flex flex-wrap gap-3">
           {existing ? (
-            <Button disabled size="lg" variant="outline">✓ Registered as {existing.ticket_tier}</Button>
+            <button disabled className="inline-flex h-10 items-center gap-2 rounded-full bg-success px-6 text-sm font-semibold text-success-foreground opacity-100 cursor-default">
+              <Check className="h-4 w-4" /> Registered
+            </button>
           ) : user ? (
-            <Button size="lg" onClick={() => register.mutate()} disabled={register.isPending || (!isFree && !tier)}>{register.isPending ? "Registering..." : "Register"}</Button>
+            <Button size="lg" onClick={() => register.mutate()} disabled={register.isPending || (!isFree && !tier)}>
+              {register.isPending ? (<><Loader2 className="h-4 w-4 animate-spin" /> Registering...</>) : "Register"}
+            </Button>
           ) : (
             <Link to="/auth"><Button size="lg">Sign in to register</Button></Link>
           )}

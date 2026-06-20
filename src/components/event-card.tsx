@@ -1,8 +1,9 @@
 import { Link } from "@tanstack/react-router";
-import { MapPin, Calendar } from "lucide-react";
+import { MapPin, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatEventDate, lowestPrice } from "@/lib/format";
 import { CATEGORY_COLOR } from "@/lib/categories";
+import { useMyRegistrations } from "@/hooks/use-my-registrations";
 
 export type EventCardData = {
   id: string;
@@ -20,6 +21,9 @@ export function EventCard({ event }: { event: EventCardData }) {
   const lowest = event.event_tickets ? lowestPrice(event.event_tickets) : null;
   const isFree = event.is_free || lowest === null;
   const catClass = CATEGORY_COLOR[event.category] || "bg-primary text-primary-foreground";
+  const { registeredIds } = useMyRegistrations();
+  const isRegistered = registeredIds.has(event.id);
+
   return (
     <article className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card transition-colors hover:border-primary/40">
       <div className="relative w-full overflow-hidden bg-muted h-[140px] md:h-[160px]">
@@ -53,9 +57,17 @@ export function EventCard({ event }: { event: EventCardData }) {
           ) : (
             <span className="rounded-md bg-primary px-2 py-1 text-xs font-semibold text-primary-foreground">KSh {Number(lowest).toLocaleString()}</span>
           )}
-          <Link to="/events/$slug" params={{ slug: event.slug }}>
-            <Button size="sm">Register</Button>
-          </Link>
+          {isRegistered ? (
+            <Link to="/events/$slug" params={{ slug: event.slug }}>
+              <span className="inline-flex items-center gap-1 rounded-full bg-success px-3 py-1.5 text-xs font-semibold text-success-foreground">
+                <Check className="h-3.5 w-3.5" /> Registered
+              </span>
+            </Link>
+          ) : (
+            <Link to="/events/$slug" params={{ slug: event.slug }}>
+              <Button size="sm">Register</Button>
+            </Link>
+          )}
         </div>
       </div>
     </article>

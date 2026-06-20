@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { formatShortDate } from "@/lib/format";
@@ -10,6 +11,16 @@ export const Route = createFileRoute("/_authenticated/admin/registrations")({
 });
 
 function AdminRegs() {
+  const qc = useQueryClient();
+  useEffect(() => {
+    const ch = supabase
+      .channel("admin-regs-list")
+      .on("postgres_changes", { event: "*", schema: "public", table: "registrations" }, () => {
+        qc.invalidateQueries({ queryKey: ["admin", "regs"] });
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [qc]);
   const { data } = useQuery({
     queryKey: ["admin", "regs"],
     queryFn: async () => {
