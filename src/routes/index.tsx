@@ -5,6 +5,7 @@ import { ArrowRight, Calendar } from "lucide-react";
 import { PageShell } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
 import { EventCard } from "@/components/event-card";
+import { BentoGrid } from "@/components/bento-grid";
 import { EmptyState } from "@/components/empty-state";
 import { useAuth } from "@/hooks/use-auth";
 import towerAsset from "@/assets/uon-tower.png.asset.json";
@@ -101,9 +102,14 @@ function HomePage() {
           {filtered.length === 0 ? (
             <EmptyState title="No events posted yet" description="Check back soon!" icon={<Calendar className="h-5 w-5" />} />
           ) : (
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {filtered.map((e) => <EventCard key={e.id} event={e} />)}
-            </div>
+            <>
+              <BentoGrid events={filtered} />
+              {filtered.length > 1 && (
+                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 mt-6">
+                  {filtered.slice(1).map((e) => <EventCard key={e.id} event={e} />)}
+                </div>
+              )}
+            </>
           )}
         </section>
 
