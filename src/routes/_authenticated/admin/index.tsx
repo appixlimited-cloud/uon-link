@@ -12,7 +12,8 @@ function AdminDashboard() {
 
   const stats = useQuery({
     queryKey: ["admin", "stats"],
-    queryFn: async () => {
+    refetchInterval: 10000,
+
       const since = new Date(Date.now() - 7 * 86400000).toISOString();
       const [students, events, regs, ops] = await Promise.all([
         supabase.from("student_profiles").select("user_id", { count: "exact", head: true }),
