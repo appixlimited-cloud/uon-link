@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { formatShortDate } from "@/lib/format";
@@ -10,19 +9,13 @@ export const Route = createFileRoute("/_authenticated/admin/")({
 });
 
 function AdminDashboard() {
-  const qc = useQueryClient();
-  useEffect(() => {
-    const ch = supabase
-      .channel("admin-regs")
-      .on("postgres_changes", { event: "*", schema: "public", table: "registrations" }, () => {
-        qc.invalidateQueries({ queryKey: ["admin"] });
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(ch); };
-  }, [qc]);
+
   const stats = useQuery({
     queryKey: ["admin", "stats"],
+    refetchInterval: 10000,
     queryFn: async () => {
+
+
       const since = new Date(Date.now() - 7 * 86400000).toISOString();
       const [students, events, regs, ops] = await Promise.all([
         supabase.from("student_profiles").select("user_id", { count: "exact", head: true }),
@@ -35,7 +28,9 @@ function AdminDashboard() {
   });
   const recent = useQuery({
     queryKey: ["admin", "recent-events"],
+    refetchInterval: 10000,
     queryFn: async () => {
+
       const { data } = await supabase.from("events").select("*, registrations(count)").order("created_at", { ascending: false }).limit(10);
       return data ?? [];
     },
