@@ -13,6 +13,8 @@ function AdminDashboard() {
   const stats = useQuery({
     queryKey: ["admin", "stats"],
     refetchInterval: 10000,
+    queryFn: async () => {
+
 
       const since = new Date(Date.now() - 7 * 86400000).toISOString();
       const [students, events, regs, ops] = await Promise.all([
