@@ -28,7 +28,9 @@ function AdminDashboard() {
   });
   const recent = useQuery({
     queryKey: ["admin", "recent-events"],
+    refetchInterval: 10000,
     queryFn: async () => {
+
       const { data } = await supabase.from("events").select("*, registrations(count)").order("created_at", { ascending: false }).limit(10);
       return data ?? [];
     },
