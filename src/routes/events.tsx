@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Outlet, useLocation } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Search } from "lucide-react";
@@ -16,9 +16,12 @@ export const Route = createFileRoute("/events")({
 });
 
 function EventsPage() {
+  const location = useLocation();
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("All");
   const [q, setQ] = useState("");
   const events = useQuery({ queryKey: ["events", "all"], queryFn: () => fetchPublishedEvents() });
+
+  if (location.pathname.replace(/\/$/, "") !== "/events") return <Outlet />;
 
   const filtered = (events.data ?? []).filter((e) => {
     const matchesFilter = filter === "All" ? true : filter === "Free" ? (e.is_free || !e.event_tickets?.some((t) => t.is_enabled)) : e.category === filter;
