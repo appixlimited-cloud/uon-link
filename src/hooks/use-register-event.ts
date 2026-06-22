@@ -57,13 +57,6 @@ export function useRegisterEvent() {
       if (error) throw error;
       return { eventId: event.id, slug: event.slug, inserted: !!data };
     },
-    onMutate: async (event) => {
-      if (!user) return;
-      await queryClient.cancelQueries({ queryKey: ["myRegistrations", user.id] });
-      const previous = queryClient.getQueryData<Set<string>>(["myRegistrations", user.id]);
-      queryClient.setQueryData(["myRegistrations", user.id], new Set([...(previous ?? new Set<string>()), event.id]));
-      return { previous, eventId: event.id, slug: event.slug };
-    },
     onSuccess: ({ eventId, slug }) => {
       toast.success("You're in! Check your email for your QR code.");
       queryClient.invalidateQueries({ queryKey: ["myRegistrations"] });
@@ -74,8 +67,7 @@ export function useRegisterEvent() {
       queryClient.invalidateQueries({ queryKey: ["admin", "regs"] });
       queryClient.setQueryData<Set<string>>(["myRegistrations", user?.id ?? "anon"], (current) => new Set([...(current ?? new Set<string>()), eventId]));
     },
-    onError: (error: any, _event, context) => {
-      if (user && context?.previous) queryClient.setQueryData(["myRegistrations", user.id], context.previous);
+    onError: (error: any) => {
       if (error?.code === "UNVERIFIED") {
         toast.error("Please verify your account first.", {
           action: { label: "Settings", onClick: () => navigate({ to: "/settings" }) },
