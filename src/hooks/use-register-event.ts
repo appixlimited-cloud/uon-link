@@ -1,8 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -88,13 +86,3 @@ export function useRegisterEvent() {
     },
   });
 }
-
-export function RegistrationSpinnerLabel({ label = "Registering..." }: { label?: string }) {
-  return (
-    <>
-      <Loader2 className="h-4 w-4 animate-spin" /> {label}
-    </>
-  );
-}
-
-export { Button };
