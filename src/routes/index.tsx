@@ -8,7 +8,7 @@ import { EventCard } from "@/components/event-card";
 import { BentoGrid } from "@/components/bento-grid";
 import { EmptyState } from "@/components/empty-state";
 import { useAuth } from "@/hooks/use-auth";
-import towerAsset from "@/assets/uon-tower.png.asset.json";
+import towerAssetUrl from "@/assets/uon-tower.png";
 import { fetchPublishedEvents, fetchUpcomingOpportunities, fetchActiveSpotlight } from "@/lib/db/queries";
 import { CATEGORY_COLOR, OPPORTUNITY_TYPE_COLOR } from "@/lib/categories";
 import { formatShortDate, daysUntil } from "@/lib/format";
@@ -43,7 +43,7 @@ function HomePage() {
       {/* Hero with campus background */}
       <section
         className="relative isolate overflow-hidden text-white"
-        style={{ backgroundImage: `url(${towerAsset.url})`, backgroundSize: "cover", backgroundPosition: "center" }}
+        style={{ backgroundImage: `url(${towerAssetUrl})`, backgroundSize: "cover", backgroundPosition: "center" }}
       >
         <div className="absolute inset-0 bg-black/60" />
         <div className="relative mx-auto max-w-7xl px-4 py-24 md:py-36 text-center">

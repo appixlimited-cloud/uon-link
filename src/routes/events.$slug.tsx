@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { ArrowLeft, Calendar, Check, Clock, Loader2, MapPin, Share2 } from "lucide-react";
 import { PageShell } from "@/components/layout/page-shell";
@@ -9,7 +9,7 @@ import { formatEventDate, googleCalUrl, whatsappShare, lowestPrice } from "@/lib
 import { CATEGORY_COLOR } from "@/lib/categories";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { toast } from "sonner";
+import { useRegisterEvent } from "@/hooks/use-register-event";
 
 export const Route = createFileRoute("/events/$slug")({
   component: EventDetailPage,
@@ -17,9 +17,7 @@ export const Route = createFileRoute("/events/$slug")({
 
 function EventDetailPage() {
   const { slug } = Route.useParams();
-  const navigate = Route.useNavigate?.() ?? (() => {});
   const { user } = useAuth();
-  const qc = useQueryClient();
   const [tier, setTier] = useState<string>("");
 
   const { data: event, isLoading } = useQuery({ queryKey: ["event", slug], queryFn: () => fetchEventBySlug(slug) });
@@ -37,44 +35,7 @@ function EventDetailPage() {
   const lowest = lowestPrice(event?.event_tickets ?? []);
   const isFree = event?.is_free || lowest === null;
 
-  const register = useMutation({
-    mutationFn: async () => {
-      if (!user) throw new Error("Please sign in");
-      if (!event) throw new Error("Event not found");
-      if (!isFree && !tier) throw new Error("Please select a ticket tier");
-      const { data: profile } = await supabase.from("student_profiles").select("*").eq("user_id", user.id).maybeSingle();
-      if (!profile?.is_verified) {
-        const err: any = new Error("Please verify your account first.");
-        err.code = "UNVERIFIED";
-        throw err;
-      }
-      const { error } = await supabase.from("registrations").insert({
-        event_id: event.id,
-        user_id: user.id,
-        student_name: profile.full_name,
-        email: user.email!,
-        registration_number: profile.registration_number,
-        faculty: profile.faculty,
-        year_of_study: profile.year_of_study,
-        ticket_tier: isFree ? "Free" : tier,
-      });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("You're in! Check your email for your QR code.");
-      qc.invalidateQueries({ queryKey: ["registration", slug] });
-      qc.invalidateQueries({ queryKey: ["myRegistrations"] });
-    },
-    onError: (e: any) => {
-      if (e?.code === "UNVERIFIED") {
-        toast.error("Please verify your account first.", {
-          action: { label: "Settings", onClick: () => navigate({ to: "/settings" }) },
-        });
-      } else {
-        toast.error("Registration failed. Please try again.");
-      }
-    },
-  });
+  const register = useRegisterEvent();
 
   if (isLoading) return <PageShell><div className="mx-auto max-w-4xl px-4 py-10">Loading...</div></PageShell>;
   if (!event) return <PageShell><div className="mx-auto max-w-4xl px-4 py-10"><Link to="/events" className="text-primary">← Back to events</Link><h1 className="text-2xl font-bold mt-4">Event not found</h1></div></PageShell>;
@@ -139,7 +100,7 @@ function EventDetailPage() {
               <Check className="h-4 w-4" /> Registered
             </button>
           ) : user ? (
-            <Button size="lg" onClick={() => register.mutate()} disabled={register.isPending || (!isFree && !tier)}>
+            <Button size="lg" onClick={() => register.mutate({ id: event.id, slug, is_free: isFree, ticket_tier: tier })} disabled={register.isPending || (!isFree && !tier)}>
               {register.isPending ? (<><Loader2 className="h-4 w-4 animate-spin" /> Registering...</>) : "Register"}
             </Button>
           ) : (

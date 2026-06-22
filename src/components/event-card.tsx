@@ -1,9 +1,11 @@
 import { Link } from "@tanstack/react-router";
-import { MapPin, Check } from "lucide-react";
+import { MapPin, Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatEventDate, lowestPrice } from "@/lib/format";
 import { CATEGORY_COLOR } from "@/lib/categories";
 import { useMyRegistrations } from "@/hooks/use-my-registrations";
+import { useRegisterEvent } from "@/hooks/use-register-event";
+import { useAuth } from "@/hooks/use-auth";
 
 export type EventCardData = {
   id: string;
@@ -22,7 +24,10 @@ export function EventCard({ event }: { event: EventCardData }) {
   const isFree = event.is_free || lowest === null;
   const catClass = CATEGORY_COLOR[event.category] || "bg-primary text-primary-foreground";
   const { registeredIds } = useMyRegistrations();
+  const { user } = useAuth();
+  const register = useRegisterEvent();
   const isRegistered = registeredIds.has(event.id);
+  const isRegistering = register.isPending && register.variables?.id === event.id;
 
   return (
     <article className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card transition-colors hover:border-primary/40">
@@ -63,10 +68,14 @@ export function EventCard({ event }: { event: EventCardData }) {
                 <Check className="h-3.5 w-3.5" /> Registered
               </span>
             </Link>
-          ) : (
-            <Link to="/events/$slug" params={{ slug: event.slug }}>
+          ) : !user ? (
+            <Link to="/auth">
               <Button size="sm">Register</Button>
             </Link>
+          ) : (
+            <Button size="sm" onClick={() => register.mutate({ id: event.id, slug: event.slug, is_free: isFree })} disabled={isRegistering}>
+              {isRegistering ? (<><Loader2 className="h-3.5 w-3.5 animate-spin" /> Registering...</>) : "Register"}
+            </Button>
           )}
         </div>
       </div>

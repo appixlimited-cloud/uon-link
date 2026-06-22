@@ -25,6 +25,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as EventsIndexRouteImport } from './routes/events.index'
 import { Route as EventsSlugRouteImport } from './routes/events.$slug'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
@@ -124,6 +125,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const EventsIndexRoute = EventsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => EventsRoute,
 } as any)
 const EventsSlugRoute = EventsSlugRouteImport.update({
   id: '/$slug',
@@ -260,6 +266,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/events/$slug': typeof EventsSlugRoute
+  '/events/': typeof EventsIndexRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/calendar': typeof AuthenticatedAdminCalendarRoute
   '/admin/clubs': typeof AuthenticatedAdminClubsRoute
@@ -284,7 +291,6 @@ export interface FileRoutesByTo {
   '/career-events': typeof CareerEventsRoute
   '/clubs': typeof ClubsRoute
   '/contact': typeof ContactRoute
-  '/events': typeof EventsRouteWithChildren
   '/notices': typeof NoticesRoute
   '/opportunities': typeof OpportunitiesRoute
   '/privacy': typeof PrivacyRoute
@@ -296,6 +302,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/events/$slug': typeof EventsSlugRoute
+  '/events': typeof EventsIndexRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/calendar': typeof AuthenticatedAdminCalendarRoute
   '/admin/clubs': typeof AuthenticatedAdminClubsRoute
@@ -335,6 +342,7 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/events/$slug': typeof EventsSlugRoute
+  '/events/': typeof EventsIndexRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/calendar': typeof AuthenticatedAdminCalendarRoute
   '/_authenticated/admin/clubs': typeof AuthenticatedAdminClubsRoute
@@ -374,6 +382,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/settings'
     | '/events/$slug'
+    | '/events/'
     | '/admin/analytics'
     | '/admin/calendar'
     | '/admin/clubs'
@@ -398,7 +407,6 @@ export interface FileRouteTypes {
     | '/career-events'
     | '/clubs'
     | '/contact'
-    | '/events'
     | '/notices'
     | '/opportunities'
     | '/privacy'
@@ -410,6 +418,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/settings'
     | '/events/$slug'
+    | '/events'
     | '/admin/analytics'
     | '/admin/calendar'
     | '/admin/clubs'
@@ -448,6 +457,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/_authenticated/settings'
     | '/events/$slug'
+    | '/events/'
     | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/calendar'
     | '/_authenticated/admin/clubs'
@@ -597,6 +607,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/events/': {
+      id: '/events/'
+      path: '/'
+      fullPath: '/events/'
+      preLoaderRoute: typeof EventsIndexRouteImport
+      parentRoute: typeof EventsRoute
     }
     '/events/$slug': {
       id: '/events/$slug'
@@ -814,10 +831,12 @@ const AuthenticatedRouteRouteWithChildren =
 
 interface EventsRouteChildren {
   EventsSlugRoute: typeof EventsSlugRoute
+  EventsIndexRoute: typeof EventsIndexRoute
 }
 
 const EventsRouteChildren: EventsRouteChildren = {
   EventsSlugRoute: EventsSlugRoute,
+  EventsIndexRoute: EventsIndexRoute,
 }
 
 const EventsRouteWithChildren =

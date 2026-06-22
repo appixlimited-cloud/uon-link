@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { resolveEventPosterUrl, resolveEventPosterUrls } from "@/lib/storage-url";
 
 export async function fetchPublishedEvents(opts?: { category?: string; categories?: string[]; limit?: number }) {
   let q = supabase
@@ -11,7 +12,7 @@ export async function fetchPublishedEvents(opts?: { category?: string; categorie
   if (opts?.limit) q = q.limit(opts.limit);
   const { data, error } = await q;
   if (error) throw error;
-  return data ?? [];
+  return resolveEventPosterUrls(data ?? []);
 }
 
 export async function fetchEventBySlug(slug: string) {
@@ -22,7 +23,7 @@ export async function fetchEventBySlug(slug: string) {
     .eq("is_published", true)
     .maybeSingle();
   if (error) throw error;
-  return data;
+  return data ? { ...data, poster_url: await resolveEventPosterUrl(data.poster_url) } : null;
 }
 
 export async function fetchUpcomingOpportunities(limit?: number) {
