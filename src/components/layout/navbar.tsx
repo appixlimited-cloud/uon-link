@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useQueryClient } from "@tanstack/react-query";
+import { NotificationBell } from "@/components/notification-bell";
 
 const NAV_LINKS = [
   { to: "/", label: "Home" },
@@ -52,6 +53,7 @@ export function Navbar() {
           {user ? (
             <>
               {isAdmin && <Link to="/admin"><Button size="sm" variant="outline">Admin</Button></Link>}
+              {isAdmin && <NotificationBell />}
               <Link to="/dashboard" className="flex items-center gap-2 rounded px-2 py-1 hover:bg-accent">
                 <span className="grid h-7 w-7 place-items-center rounded-full bg-primary text-primary-foreground text-xs font-semibold">{initials}</span>
                 <span className="text-sm">{user.email?.split("@")[0]}</span>
