@@ -42,8 +42,7 @@ function HomePage() {
 
   const onSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate({ to: "/events", search: search.trim() ? { q: search.trim() } : undefined });
-  };
+    navigate({ to: "/events" });
 
   return (
     <PageShell>
