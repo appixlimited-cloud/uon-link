@@ -43,13 +43,13 @@ function HomePage() {
       {/* Hero with campus background */}
       <section
         className="relative isolate overflow-hidden text-white"
-        style={{ backgroundImage: `url(${towerAssetUrl})`, backgroundSize: "cover", backgroundPosition: "center" }}
+        style={{ backgroundImage: `url(${towerAsset.url})`, backgroundSize: "cover", backgroundPosition: "center" }}
       >
         <div className="absolute inset-0 bg-black/60" />
         <div className="relative mx-auto max-w-7xl px-4 py-24 md:py-36 text-center">
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight drop-shadow-lg">Your Gateway to Campus Life</h1>
           <p className="mt-4 text-base md:text-lg text-white/90 max-w-2xl mx-auto drop-shadow">
-            Discover events, opportunities, and everything happening at the University of Nairobi
+            Discover events, opportunities, and everything happening at the University of Nairobi and beyond
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link to="/events"><Button size="lg" variant="secondary">Browse Events <ArrowRight className="ml-1.5 h-4 w-4" /></Button></Link>
