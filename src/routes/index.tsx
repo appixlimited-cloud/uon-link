@@ -8,7 +8,7 @@ import { EventCard } from "@/components/event-card";
 import { BentoGrid } from "@/components/bento-grid";
 import { EmptyState } from "@/components/empty-state";
 import { useAuth } from "@/hooks/use-auth";
-import towerAssetUrl from "@/assets/uon-tower.png";
+import towerAsset from "@/assets/uon-tower-hero.jpg.asset.json";
 import { fetchPublishedEvents, fetchUpcomingOpportunities, fetchActiveSpotlight } from "@/lib/db/queries";
 import { CATEGORY_COLOR, OPPORTUNITY_TYPE_COLOR } from "@/lib/categories";
 import { formatShortDate, daysUntil } from "@/lib/format";
