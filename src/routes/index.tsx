@@ -27,6 +27,8 @@ export const Route = createFileRoute("/")({
 
 function HomePage() {
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("All");
+  const [search, setSearch] = useState("");
+  const navigate = useNavigate();
   const { user, loading } = useAuth();
   const events = useQuery({ queryKey: ["events", "home"], queryFn: () => fetchPublishedEvents({ limit: 9 }) });
   const ops = useQuery({ queryKey: ["opps", "home"], queryFn: () => fetchUpcomingOpportunities(4) });
@@ -38,6 +40,11 @@ function HomePage() {
     return e.category === filter;
   });
 
+  const onSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    navigate({ to: "/events", search: search.trim() ? { q: search.trim() } : undefined });
+  };
+
   return (
     <PageShell>
       {/* Hero with campus background */}
@@ -45,24 +52,38 @@ function HomePage() {
         className="relative isolate overflow-hidden text-white"
         style={{ backgroundImage: `url(${towerAsset.url})`, backgroundSize: "cover", backgroundPosition: "center" }}
       >
-        <div className="absolute inset-0 bg-black/60" />
-        <div className="relative mx-auto max-w-7xl px-4 py-24 md:py-36 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight drop-shadow-lg">Your Gateway to Campus Life</h1>
-          <p className="mt-4 text-base md:text-lg text-white/90 max-w-2xl mx-auto drop-shadow">
+        <div className="absolute inset-0 bg-black/55" />
+        <div className="relative mx-auto max-w-7xl px-4 py-20 md:py-28">
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tight drop-shadow-lg max-w-3xl">
+            Connect with Campus Life
+          </h1>
+          <p className="mt-4 text-base md:text-lg text-white/90 max-w-2xl drop-shadow">
             Discover events, opportunities, and everything happening at the University of Nairobi and beyond
           </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Link to="/events"><Button size="lg" variant="secondary">Browse Events <ArrowRight className="ml-1.5 h-4 w-4" /></Button></Link>
-            <Link to="/opportunities"><Button size="lg" variant="outline" className="bg-white/10 text-white border-white/40 hover:bg-white/20 hover:text-white backdrop-blur-sm">Opportunities</Button></Link>
-          </div>
+
+          <form onSubmit={onSearch} className="mt-8 flex w-full max-w-2xl items-center gap-2 rounded-xl bg-white/95 backdrop-blur p-2 shadow-lg">
+            <div className="flex flex-1 items-center gap-2 px-3">
+              <Search className="h-4 w-4 text-muted-foreground" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="What are you looking for?"
+                className="flex-1 bg-transparent py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+              />
+            </div>
+            <Button type="submit" size="lg" className="font-semibold">Search</Button>
+          </form>
+
           {!loading && !user && (
-            <div className="mt-6 flex flex-wrap justify-center gap-3">
+            <div className="mt-6 flex flex-wrap gap-3">
               <Link to="/signup"><Button size="lg" className="bg-white text-black hover:bg-white/90 font-semibold">Sign Up</Button></Link>
               <Link to="/auth"><Button size="lg" variant="outline" className="bg-transparent text-white border-white/40 hover:bg-white/10 hover:text-white">Log In</Button></Link>
             </div>
           )}
         </div>
       </section>
+
 
       <div className="mx-auto max-w-7xl px-4 py-12 space-y-14">
         {/* Spotlight */}
