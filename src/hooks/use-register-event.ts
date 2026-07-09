@@ -57,8 +57,12 @@ export function useRegisterEvent() {
       if (error) throw error;
       return { eventId: event.id, slug: event.slug, inserted: !!data };
     },
-    onSuccess: ({ eventId, slug }) => {
-      toast.success("You're in! Check your email for your QR code.");
+    onSuccess: ({ eventId, slug, inserted }) => {
+      if (inserted) {
+        toast.success("You're in! Check your email for your QR code.");
+      } else {
+        toast("You are already registered for this event.");
+      }
       queryClient.invalidateQueries({ queryKey: ["myRegistrations"] });
       queryClient.invalidateQueries({ queryKey: ["registration"] });
       if (slug) queryClient.invalidateQueries({ queryKey: ["registration", slug] });
