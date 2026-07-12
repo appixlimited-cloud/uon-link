@@ -16,13 +16,20 @@ function AdminDashboard() {
     queryKey: ["admin", "stats"],
     queryFn: async () => {
       const since = new Date(Date.now() - 7 * 86400000).toISOString();
-      const [students, events, regs, ops] = await Promise.all([
+      const [students, events, regsTotal, regs7d, ops] = await Promise.all([
         supabase.from("student_profiles").select("user_id", { count: "exact", head: true }),
         supabase.from("events").select("id", { count: "exact", head: true }),
+        supabase.from("registrations").select("id", { count: "exact", head: true }),
         supabase.from("registrations").select("id", { count: "exact", head: true }).gte("created_at", since),
         supabase.from("opportunities").select("id", { count: "exact", head: true }).eq("is_published", true),
       ]);
-      return { students: students.count ?? 0, events: events.count ?? 0, regs: regs.count ?? 0, ops: ops.count ?? 0 };
+      return {
+        students: students.count ?? 0,
+        events: events.count ?? 0,
+        regs: regsTotal.count ?? 0,
+        regs7d: regs7d.count ?? 0,
+        ops: ops.count ?? 0,
+      };
     },
   });
   const recent = useQuery({
