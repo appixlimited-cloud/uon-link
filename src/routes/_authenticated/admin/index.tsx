@@ -54,7 +54,8 @@ function AdminDashboard() {
   const cards = [
     { label: "Total Students", value: stats.data?.students ?? 0, color: "text-primary" },
     { label: "Events Posted", value: stats.data?.events ?? 0, color: "text-cat-tech" },
-    { label: "Registrations (7d)", value: stats.data?.regs ?? 0, color: "text-success" },
+    { label: "Registrations", value: stats.data?.regs ?? 0, color: "text-success" },
+    { label: "Registrations (7d)", value: stats.data?.regs7d ?? 0, color: "text-success" },
     { label: "Open Opportunities", value: stats.data?.ops ?? 0, color: "text-cat-entertainment" },
   ];
 
