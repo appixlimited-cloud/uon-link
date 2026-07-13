@@ -133,13 +133,13 @@ function EventDetailPage() {
         {/* HERO — two column */}
         <div className="grid gap-6 md:gap-8 lg:grid-cols-[1.15fr_1fr]">
           {/* Poster */}
-          <div className="relative overflow-hidden rounded-2xl bg-muted shadow-lg ring-1 ring-border/60">
-            <div className={`aspect-[4/5] md:aspect-[3/4] w-full ${event.poster_url ? "" : catClass}`}>
+          <div className={`relative overflow-hidden rounded-2xl shadow-lg ring-1 ring-border/60 ${catClass}`}>
+            <div className="w-full">
               {event.poster_url && (
                 <img
                   src={event.poster_url}
                   alt={event.title}
-                  className="h-full w-full object-cover transition-transform duration-500 hover:scale-[1.02]"
+                  className="w-full h-auto object-contain transition-transform duration-500 hover:scale-[1.02]"
                   onError={(e) => {
                     e.currentTarget.style.display = "none";
                   }}
