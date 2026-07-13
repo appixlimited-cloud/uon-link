@@ -59,7 +59,7 @@ export function useRegisterEvent() {
     },
     onSuccess: ({ eventId, slug, inserted }) => {
       if (inserted) {
-        toast.success("You're in! Check your email for your QR code.");
+        toast.success("You are registered! Check your email for your QR code.");
       } else {
         toast("You are already registered for this event.");
       }
