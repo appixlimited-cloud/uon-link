@@ -31,22 +31,18 @@ export function EventCard({ event }: { event: EventCardData }) {
 
   return (
     <article className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card transition-colors hover:border-primary/40">
-      <div className="relative w-full overflow-hidden bg-muted h-[140px] md:h-[160px]">
+      <div className={`relative w-full overflow-hidden h-[180px] md:h-[200px] ${catClass}`}>
         {event.poster_url ? (
           <img
             src={event.poster_url}
             alt={event.title}
             loading="lazy"
-            className="h-full w-full object-cover transition-transform group-hover:scale-[1.02]"
+            className="h-full w-full object-contain transition-transform group-hover:scale-[1.02]"
             onError={(e) => {
-              const img = e.currentTarget;
-              img.style.display = "none";
-              img.parentElement?.classList.add(...catClass.split(" "));
+              e.currentTarget.style.display = "none";
             }}
           />
-        ) : (
-          <div className={`flex h-full w-full items-center justify-center ${catClass}`} />
-        )}
+        ) : null}
         <span className={`absolute top-2 left-2 text-xs px-2 py-1 rounded shadow ${catClass}`}>{event.category}</span>
       </div>
       <div className="flex flex-1 flex-col gap-2 p-4">
