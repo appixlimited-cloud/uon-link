@@ -1,12 +1,14 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { EVENT_CATEGORIES } from "@/lib/categories";
 import { toast } from "sonner";
@@ -21,6 +23,8 @@ function EditEventPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [saving, setSaving] = useState(false);
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "event", id],
     queryFn: async () => (await supabase.from("events").select("*, event_tickets(*)").eq("id", id).single()).data,
@@ -28,11 +32,17 @@ function EditEventPage() {
   const [form, setForm] = useState<any>({});
   const [tiers, setTiers] = useState<Tier[]>([]);
   const [posterUrl, setPosterUrl] = useState("");
+  const [existingPoster, setExistingPoster] = useState<string>("");
+  const [posterFile, setPosterFile] = useState<File | null>(null);
+  const [posterPreview, setPosterPreview] = useState<string>("");
+  const [registrationLimit, setRegistrationLimit] = useState<string>("");
 
   useEffect(() => {
     if (!data) return;
     setForm(data);
     setPosterUrl(data.poster_url || "");
+    setExistingPoster(data.poster_url || "");
+    setRegistrationLimit(data.registration_limit ? String(data.registration_limit) : "");
     const existing: Record<string, any> = {};
     (data.event_tickets || []).forEach((t: any) => { existing[t.tier_name] = t; });
     setTiers(["Regular", "VIP", "VVIP"].map((n) => {
@@ -41,30 +51,62 @@ function EditEventPage() {
     }));
   }, [data]);
 
+  function pickFile(f: File) {
+    if (f.size > 5 * 1024 * 1024) return toast.error("Max 5MB");
+    if (!["image/jpeg", "image/png", "image/webp"].includes(f.type)) return toast.error("JPG, PNG, or WEBP only");
+    setPosterFile(f);
+    setPosterPreview(URL.createObjectURL(f));
+  }
+
   async function save() {
-    await supabase.from("events").update({
-      title: form.title, description: form.description, category: form.category,
-      venue: form.venue, date: form.date, time: form.time || null,
-      is_free: form.is_free, is_published: form.is_published, is_featured: form.is_featured,
-      poster_url: posterUrl || null,
-    }).eq("id", id);
-    // upsert tiers
-    for (const t of tiers) {
-      if (t.id) {
-        await supabase.from("event_tickets").update({
-          price: Number(t.price || 0), description: t.description || null,
-          quantity_available: t.quantity ? Number(t.quantity) : null, is_enabled: t.is_enabled,
-        }).eq("id", t.id);
-      } else if (t.is_enabled) {
-        await supabase.from("event_tickets").insert({
-          event_id: id, tier_name: t.tier_name, price: Number(t.price || 0),
-          description: t.description || null, quantity_available: t.quantity ? Number(t.quantity) : null, is_enabled: true,
-        });
-      }
+    if (!form.title || !form.date || !form.category || !form.venue) {
+      return toast.error("Title, category, venue, and date are required");
     }
-    toast.success("Saved");
-    qc.invalidateQueries({ queryKey: ["admin", "event", id] });
-    qc.invalidateQueries({ queryKey: ["admin", "events"] });
+    if (!form.is_free && !tiers.some((t) => t.is_enabled)) {
+      return toast.error("Enable at least one ticket tier or mark as free");
+    }
+    setSaving(true);
+    try {
+      let poster = posterUrl || null;
+      if (posterFile) {
+        const ext = posterFile.name.split(".").pop();
+        const path = `events/${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`;
+        const { error: upErr } = await supabase.storage.from("event-posters").upload(path, posterFile);
+        if (upErr) throw upErr;
+        poster = path;
+      }
+      const { error } = await supabase.from("events").update({
+        title: form.title, description: form.description, category: form.category,
+        venue: form.venue, date: form.date, time: form.time || null,
+        is_free: form.is_free, is_published: form.is_published, is_featured: form.is_featured,
+        poster_url: poster,
+        registration_limit: registrationLimit ? Number(registrationLimit) : null,
+      }).eq("id", id);
+      if (error) throw error;
+
+      for (const t of tiers) {
+        if (t.id) {
+          await supabase.from("event_tickets").update({
+            price: Number(t.price || 0), description: t.description || null,
+            quantity_available: t.quantity ? Number(t.quantity) : null, is_enabled: t.is_enabled,
+          }).eq("id", t.id);
+        } else if (t.is_enabled) {
+          await supabase.from("event_tickets").insert({
+            event_id: id, tier_name: t.tier_name, price: Number(t.price || 0),
+            description: t.description || null, quantity_available: t.quantity ? Number(t.quantity) : null, is_enabled: true,
+          });
+        }
+      }
+      toast.success("Event updated successfully");
+      qc.invalidateQueries({ queryKey: ["admin", "event", id] });
+      qc.invalidateQueries({ queryKey: ["admin", "events"] });
+      qc.invalidateQueries({ queryKey: ["events"] });
+      qc.invalidateQueries({ queryKey: ["event"] });
+    } catch (e: any) {
+      toast.error(e?.message || "Failed to save changes. Please try again.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   if (isLoading || !data) return <p>Loading...</p>;
@@ -86,11 +128,44 @@ function EditEventPage() {
           <div><Label>Time</Label><Input type="time" value={form.time || ""} onChange={(e) => setForm({ ...form, time: e.target.value })} /></div>
         </div>
         <div><Label>Description</Label><Textarea rows={4} value={form.description || ""} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
-        <div><Label>Poster URL</Label><Input value={posterUrl} onChange={(e) => setPosterUrl(e.target.value)} /></div>
-        {posterUrl && <img src={posterUrl} alt="" className="max-h-60 rounded border border-border" />}
+        <div>
+          <Label>Registration Limit (optional)</Label>
+          <Input type="number" min="0" value={registrationLimit} onChange={(e) => setRegistrationLimit(e.target.value)} placeholder="Leave blank for unlimited" />
+        </div>
         <div className="flex items-center justify-between"><span className="text-sm">Free event</span><Switch checked={form.is_free ?? true} onCheckedChange={(v) => setForm({ ...form, is_free: v })} /></div>
         <div className="flex items-center justify-between"><span className="text-sm">Published</span><Switch checked={form.is_published ?? false} onCheckedChange={(v) => setForm({ ...form, is_published: v })} /></div>
         <div className="flex items-center justify-between"><span className="text-sm">Featured</span><Switch checked={form.is_featured ?? false} onCheckedChange={(v) => setForm({ ...form, is_featured: v })} /></div>
+      </div>
+
+      <div className="rounded-lg border border-border bg-card p-6 space-y-4">
+        <h2 className="font-semibold">Poster Image</h2>
+        {existingPoster && !posterPreview && (
+          <div className="rounded-lg border border-border overflow-hidden bg-secondary">
+            <img src={existingPoster} alt="Current poster" className="w-full max-h-80 object-contain" />
+            <p className="p-2 text-xs text-muted-foreground">Current poster</p>
+          </div>
+        )}
+        <Tabs defaultValue="upload">
+          <TabsList><TabsTrigger value="upload">Upload New</TabsTrigger><TabsTrigger value="url">Paste URL</TabsTrigger></TabsList>
+          <TabsContent value="upload">
+            <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={(e) => e.target.files?.[0] && pickFile(e.target.files[0])} />
+            {posterPreview ? (
+              <div className="relative rounded-lg border border-border overflow-hidden">
+                <img src={posterPreview} alt="" className="w-full max-h-80 object-contain bg-secondary" />
+                <button type="button" onClick={() => { setPosterFile(null); setPosterPreview(""); }} className="absolute top-2 right-2 grid h-8 w-8 place-items-center rounded-full bg-background border"><X className="h-4 w-4" /></button>
+              </div>
+            ) : (
+              <button type="button" onClick={() => fileRef.current?.click()} className="flex flex-col items-center justify-center gap-2 w-full rounded-lg border-2 border-dashed border-border p-8 hover:border-primary">
+                <Upload className="h-6 w-6 text-muted-foreground" />
+                <p className="text-sm font-medium">Click to upload a new poster</p>
+                <p className="text-xs text-muted-foreground">JPG, PNG, WEBP · Max 5MB</p>
+              </button>
+            )}
+          </TabsContent>
+          <TabsContent value="url">
+            <Input value={posterUrl} onChange={(e) => setPosterUrl(e.target.value)} placeholder="https://..." />
+          </TabsContent>
+        </Tabs>
       </div>
 
       {!form.is_free && (
@@ -114,7 +189,7 @@ function EditEventPage() {
       )}
 
       <div className="flex gap-2">
-        <Button onClick={save}>Save</Button>
+        <Button onClick={save} disabled={saving}>{saving ? "Saving..." : "Save Changes"}</Button>
         <Button variant="outline" onClick={() => navigate({ to: "/admin/events" })}>Back</Button>
       </div>
     </div>
