@@ -178,6 +178,7 @@ export type Database = {
           is_free: boolean
           is_published: boolean
           poster_url: string | null
+          registration_limit: number | null
           slug: string
           time: string | null
           title: string
@@ -195,6 +196,7 @@ export type Database = {
           is_free?: boolean
           is_published?: boolean
           poster_url?: string | null
+          registration_limit?: number | null
           slug: string
           time?: string | null
           title: string
@@ -212,6 +214,7 @@ export type Database = {
           is_free?: boolean
           is_published?: boolean
           poster_url?: string | null
+          registration_limit?: number | null
           slug?: string
           time?: string | null
           title?: string
