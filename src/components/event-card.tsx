@@ -31,11 +31,11 @@ export function EventCard({ event }: { event: EventCardData }) {
   const isRegistering = register.isPending && register.variables?.id === event.id;
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+    <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-card shadow-lg shadow-black/30 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/10">
       <Link
         to="/events/$slug"
         params={{ slug: event.slug }}
-        className="relative block w-full overflow-hidden bg-muted"
+        className={`relative block w-full overflow-hidden ${catClass}`}
         style={{ aspectRatio: "3 / 4" }}
       >
         {event.poster_url ? (
@@ -43,16 +43,13 @@ export function EventCard({ event }: { event: EventCardData }) {
             src={event.poster_url}
             alt={event.title}
             loading="lazy"
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="absolute inset-0 h-full w-full object-contain transition-transform duration-500 group-hover:scale-[1.03]"
             onError={(e) => {
-              const img = e.currentTarget;
-              img.style.display = "none";
-              img.parentElement?.classList.add(...catClass.split(" "));
+              e.currentTarget.style.display = "none";
             }}
           />
-        ) : (
-          <div className={`absolute inset-0 ${catClass}`} />
-        )}
+        ) : null}
+
         <span className={`absolute left-3 top-3 rounded-full px-2.5 py-1 text-[11px] font-semibold shadow-sm ${catClass}`}>
           {event.category}
         </span>
