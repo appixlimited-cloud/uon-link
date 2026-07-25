@@ -26,6 +26,17 @@ export function Navbar() {
   const navigate = useNavigate();
   const qc = useQueryClient();
 
+  const avatar = useQuery({
+    queryKey: ["nav-avatar", user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      const { data } = await supabase.from("student_profiles").select("avatar_url").eq("user_id", user.id).maybeSingle();
+      return data?.avatar_url ?? null;
+    },
+    enabled: !!user,
+    staleTime: 60_000,
+  });
+
   const initials = user?.email?.slice(0, 2).toUpperCase() ?? "U";
 
   async function signOut() {
