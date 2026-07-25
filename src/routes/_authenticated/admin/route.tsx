@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, Link, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Bell, Calendar as CalIcon, Settings, Users, Megaphone, Briefcase, ClipboardList, BarChart3, Download, FileText, Star, Sparkles, LayoutDashboard, PlusCircle, Building2 } from "lucide-react";
+import { Bell, Calendar as CalIcon, Settings, Users, Megaphone, Briefcase, ClipboardList, BarChart3, Download, FileText, Star, Sparkles, LayoutDashboard, PlusCircle, Building2, QrCode } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({ meta: [{ title: "Admin — UoN Link" }] }),
@@ -12,6 +12,7 @@ const NAV: Array<{ to: any; label: string; icon: any; exact?: boolean }> = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/create-event", label: "New Event", icon: PlusCircle },
   { to: "/admin/events", label: "Events", icon: CalIcon },
+  { to: "/admin/scanner", label: "Scanner", icon: QrCode },
   { to: "/admin/opportunities", label: "Opportunities", icon: Briefcase },
   { to: "/admin/notices", label: "Notices", icon: Megaphone },
   { to: "/admin/clubs", label: "Clubs", icon: Building2 },
