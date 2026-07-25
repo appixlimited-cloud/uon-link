@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useRef } from "react";
-import { Upload } from "lucide-react";
+import { Upload, Trash2 } from "lucide-react";
 import { PageShell } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -51,16 +51,25 @@ function ProfilePage() {
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) return toast.error("JPG, PNG, or WEBP only");
     setUploading(true);
     try {
-      const ext = file.name.split(".").pop();
+      const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
       const path = `${user.id}/avatar-${Date.now()}.${ext}`;
-      const { error } = await supabase.storage.from("profile-pictures").upload(path, file, { upsert: true });
+      const { error } = await supabase.storage.from("profile-pictures").upload(path, file, { upsert: true, contentType: file.type });
       if (error) throw error;
       const { data } = supabase.storage.from("profile-pictures").getPublicUrl(path);
       await supabase.from("student_profiles").update({ avatar_url: data.publicUrl }).eq("user_id", user.id);
       qc.invalidateQueries({ queryKey: ["profile", user.id] });
+      qc.invalidateQueries({ queryKey: ["nav-avatar", user.id] });
       toast.success("Avatar updated");
     } catch (e: any) { toast.error(e.message ?? "Upload failed"); }
     finally { setUploading(false); }
+  }
+
+  async function removeAvatar() {
+    const { error } = await supabase.from("student_profiles").update({ avatar_url: null }).eq("user_id", user.id);
+    if (error) return toast.error(error.message);
+    qc.invalidateQueries({ queryKey: ["profile", user.id] });
+    qc.invalidateQueries({ queryKey: ["nav-avatar", user.id] });
+    toast.success("Photo removed");
   }
 
   const p = profile.data;
@@ -78,7 +87,11 @@ function ProfilePage() {
                 <div className="grid h-28 w-28 place-items-center rounded-full bg-primary text-primary-foreground text-3xl font-bold">{initials}</div>
               )}
               <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={(e) => e.target.files?.[0] && uploadAvatar(e.target.files[0])} />
-              <Button size="sm" variant="outline" className="mt-3" onClick={() => fileRef.current?.click()} disabled={uploading}><Upload className="h-3 w-3 mr-1.5" />{uploading ? "Uploading..." : "Change photo"}</Button>
+              <div className="mt-3 flex gap-2">
+                <Button size="sm" variant="outline" onClick={() => fileRef.current?.click()} disabled={uploading}><Upload className="h-3 w-3 mr-1.5" />{uploading ? "Uploading…" : p?.avatar_url ? "Change" : "Upload"}</Button>
+                {p?.avatar_url && <Button size="sm" variant="ghost" onClick={removeAvatar}><Trash2 className="h-3 w-3 mr-1.5" />Remove</Button>}
+              </div>
+              <p className="mt-1 text-[10px] text-muted-foreground">JPG, PNG, WEBP · max 5MB</p>
               <h2 className="mt-4 text-lg font-semibold">{p?.full_name}</h2>
               {p?.registration_number && <p className="text-xs text-muted-foreground">{p.registration_number}</p>}
               {!editing && <Button size="sm" className="mt-3" onClick={startEdit}>Edit Profile</Button>}

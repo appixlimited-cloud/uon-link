@@ -59,11 +59,16 @@ export function useRegisterEvent() {
     },
     onSuccess: ({ eventId, slug, inserted }) => {
       if (inserted) {
-        toast.success("You are registered! Check your email for your QR code.");
+        toast.success("You are registered! Your ticket is ready.", {
+          action: { label: "View ticket", onClick: () => navigate({ to: "/my-tickets" }) },
+        });
       } else {
-        toast("You are already registered for this event.");
+        toast("You are already registered for this event.", {
+          action: { label: "View ticket", onClick: () => navigate({ to: "/my-tickets" }) },
+        });
       }
       queryClient.invalidateQueries({ queryKey: ["myRegistrations"] });
+      queryClient.invalidateQueries({ queryKey: ["myTickets"] });
       queryClient.invalidateQueries({ queryKey: ["registration"] });
       if (slug) queryClient.invalidateQueries({ queryKey: ["registration", slug] });
       queryClient.invalidateQueries({ queryKey: ["admin", "stats"] });

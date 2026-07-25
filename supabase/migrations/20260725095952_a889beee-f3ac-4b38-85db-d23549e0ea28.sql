@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.auto_issue_ticket() FROM PUBLIC, anon, authenticated;

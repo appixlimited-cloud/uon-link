@@ -1,10 +1,10 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Menu, X, LogOut, Settings } from "lucide-react";
+import { Menu, X, LogOut, Settings, Ticket } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { NotificationBell } from "@/components/notification-bell";
 
 const NAV_LINKS = [
@@ -25,6 +25,17 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const qc = useQueryClient();
+
+  const avatar = useQuery({
+    queryKey: ["nav-avatar", user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      const { data } = await supabase.from("student_profiles").select("avatar_url").eq("user_id", user.id).maybeSingle();
+      return data?.avatar_url ?? null;
+    },
+    enabled: !!user,
+    staleTime: 60_000,
+  });
 
   const initials = user?.email?.slice(0, 2).toUpperCase() ?? "U";
 
@@ -54,8 +65,13 @@ export function Navbar() {
             <>
               {isAdmin && <Link to="/admin"><Button size="sm" variant="outline">Admin</Button></Link>}
               {isAdmin && <NotificationBell />}
+              <Link to="/my-tickets"><Button size="sm" variant="ghost"><Ticket className="h-4 w-4 mr-1.5" />Tickets</Button></Link>
               <Link to="/dashboard" className="flex items-center gap-2 rounded px-2 py-1 hover:bg-accent">
-                <span className="grid h-7 w-7 place-items-center rounded-full bg-primary text-primary-foreground text-xs font-semibold">{initials}</span>
+                {avatar.data ? (
+                  <img src={avatar.data} alt="" className="h-7 w-7 rounded-full object-cover" />
+                ) : (
+                  <span className="grid h-7 w-7 place-items-center rounded-full bg-primary text-primary-foreground text-xs font-semibold">{initials}</span>
+                )}
                 <span className="text-sm">{user.email?.split("@")[0]}</span>
               </Link>
               <Link to="/settings"><Button size="icon" variant="ghost" aria-label="Settings"><Settings className="h-4 w-4" /></Button></Link>
@@ -85,6 +101,7 @@ export function Navbar() {
                 <>
                   {isAdmin && <Link to="/admin" onClick={() => setOpen(false)}><Button size="sm" variant="outline" className="w-full">Admin</Button></Link>}
                   <Link to="/dashboard" onClick={() => setOpen(false)}><Button size="sm" variant="ghost" className="w-full">Dashboard</Button></Link>
+                  <Link to="/my-tickets" onClick={() => setOpen(false)}><Button size="sm" variant="ghost" className="w-full"><Ticket className="h-4 w-4 mr-2" />My Tickets</Button></Link>
                   <Link to="/settings" onClick={() => setOpen(false)}><Button size="sm" variant="ghost" className="w-full"><Settings className="h-4 w-4 mr-2" />Settings</Button></Link>
                   <Button size="sm" onClick={() => { setOpen(false); signOut(); }} variant="outline">Sign out</Button>
                 </>

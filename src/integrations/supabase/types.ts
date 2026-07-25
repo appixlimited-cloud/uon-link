@@ -462,6 +462,66 @@ export type Database = {
         }
         Relationships: []
       }
+      tickets: {
+        Row: {
+          checked_in_at: string | null
+          checked_in_by: string | null
+          created_at: string
+          event_id: string
+          id: string
+          registration_id: string
+          seat_number: string | null
+          status: Database["public"]["Enums"]["ticket_status"]
+          ticket_code: string
+          ticket_tier: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          checked_in_at?: string | null
+          checked_in_by?: string | null
+          created_at?: string
+          event_id: string
+          id?: string
+          registration_id: string
+          seat_number?: string | null
+          status?: Database["public"]["Enums"]["ticket_status"]
+          ticket_code?: string
+          ticket_tier?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          checked_in_at?: string | null
+          checked_in_by?: string | null
+          created_at?: string
+          event_id?: string
+          id?: string
+          registration_id?: string
+          seat_number?: string | null
+          status?: Database["public"]["Enums"]["ticket_status"]
+          ticket_code?: string
+          ticket_tier?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tickets_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tickets_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: true
+            referencedRelation: "registrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -498,6 +558,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "student"
+      ticket_status: "active" | "used" | "cancelled" | "expired"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -626,6 +687,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "student"],
+      ticket_status: ["active", "used", "cancelled", "expired"],
     },
   },
 } as const
