@@ -101,6 +101,7 @@ export function Navbar() {
                 <>
                   {isAdmin && <Link to="/admin" onClick={() => setOpen(false)}><Button size="sm" variant="outline" className="w-full">Admin</Button></Link>}
                   <Link to="/dashboard" onClick={() => setOpen(false)}><Button size="sm" variant="ghost" className="w-full">Dashboard</Button></Link>
+                  <Link to="/my-tickets" onClick={() => setOpen(false)}><Button size="sm" variant="ghost" className="w-full"><Ticket className="h-4 w-4 mr-2" />My Tickets</Button></Link>
                   <Link to="/settings" onClick={() => setOpen(false)}><Button size="sm" variant="ghost" className="w-full"><Settings className="h-4 w-4 mr-2" />Settings</Button></Link>
                   <Button size="sm" onClick={() => { setOpen(false); signOut(); }} variant="outline">Sign out</Button>
                 </>
