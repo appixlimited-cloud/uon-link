@@ -87,7 +87,11 @@ function ProfilePage() {
                 <div className="grid h-28 w-28 place-items-center rounded-full bg-primary text-primary-foreground text-3xl font-bold">{initials}</div>
               )}
               <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={(e) => e.target.files?.[0] && uploadAvatar(e.target.files[0])} />
-              <Button size="sm" variant="outline" className="mt-3" onClick={() => fileRef.current?.click()} disabled={uploading}><Upload className="h-3 w-3 mr-1.5" />{uploading ? "Uploading..." : "Change photo"}</Button>
+              <div className="mt-3 flex gap-2">
+                <Button size="sm" variant="outline" onClick={() => fileRef.current?.click()} disabled={uploading}><Upload className="h-3 w-3 mr-1.5" />{uploading ? "Uploading…" : p?.avatar_url ? "Change" : "Upload"}</Button>
+                {p?.avatar_url && <Button size="sm" variant="ghost" onClick={removeAvatar}><Trash2 className="h-3 w-3 mr-1.5" />Remove</Button>}
+              </div>
+              <p className="mt-1 text-[10px] text-muted-foreground">JPG, PNG, WEBP · max 5MB</p>
               <h2 className="mt-4 text-lg font-semibold">{p?.full_name}</h2>
               {p?.registration_number && <p className="text-xs text-muted-foreground">{p.registration_number}</p>}
               {!editing && <Button size="sm" className="mt-3" onClick={startEdit}>Edit Profile</Button>}
