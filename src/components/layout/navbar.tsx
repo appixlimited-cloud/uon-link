@@ -65,8 +65,13 @@ export function Navbar() {
             <>
               {isAdmin && <Link to="/admin"><Button size="sm" variant="outline">Admin</Button></Link>}
               {isAdmin && <NotificationBell />}
+              <Link to="/my-tickets"><Button size="sm" variant="ghost"><Ticket className="h-4 w-4 mr-1.5" />Tickets</Button></Link>
               <Link to="/dashboard" className="flex items-center gap-2 rounded px-2 py-1 hover:bg-accent">
-                <span className="grid h-7 w-7 place-items-center rounded-full bg-primary text-primary-foreground text-xs font-semibold">{initials}</span>
+                {avatar.data ? (
+                  <img src={avatar.data} alt="" className="h-7 w-7 rounded-full object-cover" />
+                ) : (
+                  <span className="grid h-7 w-7 place-items-center rounded-full bg-primary text-primary-foreground text-xs font-semibold">{initials}</span>
+                )}
                 <span className="text-sm">{user.email?.split("@")[0]}</span>
               </Link>
               <Link to="/settings"><Button size="icon" variant="ghost" aria-label="Settings"><Settings className="h-4 w-4" /></Button></Link>
