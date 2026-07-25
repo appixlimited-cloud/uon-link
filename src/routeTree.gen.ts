@@ -26,15 +26,19 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as EventsIndexRouteImport } from './routes/events.index'
+import { Route as VerifyTicketIdRouteImport } from './routes/verify.$ticketId'
 import { Route as EventsSlugRouteImport } from './routes/events.$slug'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedMyTicketsRouteImport } from './routes/_authenticated/my-tickets'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as AuthenticatedTicketsTicketIdRouteImport } from './routes/_authenticated/tickets.$ticketId'
 import { Route as AuthenticatedAdminStudentsRouteImport } from './routes/_authenticated/admin/students'
 import { Route as AuthenticatedAdminSpotlightRouteImport } from './routes/_authenticated/admin/spotlight'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
+import { Route as AuthenticatedAdminScannerRouteImport } from './routes/_authenticated/admin/scanner'
 import { Route as AuthenticatedAdminRegistrationsRouteImport } from './routes/_authenticated/admin/registrations'
 import { Route as AuthenticatedAdminOpportunitiesRouteImport } from './routes/_authenticated/admin/opportunities'
 import { Route as AuthenticatedAdminNoticesRouteImport } from './routes/_authenticated/admin/notices'
@@ -131,6 +135,11 @@ const EventsIndexRoute = EventsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => EventsRoute,
 } as any)
+const VerifyTicketIdRoute = VerifyTicketIdRouteImport.update({
+  id: '/verify/$ticketId',
+  path: '/verify/$ticketId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EventsSlugRoute = EventsSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -144,6 +153,11 @@ const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMyTicketsRoute = AuthenticatedMyTicketsRouteImport.update({
+  id: '/my-tickets',
+  path: '/my-tickets',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
@@ -161,6 +175,12 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const AuthenticatedTicketsTicketIdRoute =
+  AuthenticatedTicketsTicketIdRouteImport.update({
+    id: '/tickets/$ticketId',
+    path: '/tickets/$ticketId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminStudentsRoute =
   AuthenticatedAdminStudentsRouteImport.update({
     id: '/students',
@@ -177,6 +197,12 @@ const AuthenticatedAdminSettingsRoute =
   AuthenticatedAdminSettingsRouteImport.update({
     id: '/settings',
     path: '/settings',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminScannerRoute =
+  AuthenticatedAdminScannerRouteImport.update({
+    id: '/scanner',
+    path: '/scanner',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const AuthenticatedAdminRegistrationsRoute =
@@ -263,9 +289,11 @@ export interface FileRoutesByFullPath {
   '/uni-vibe': typeof UniVibeRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/my-tickets': typeof AuthenticatedMyTicketsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/events/$slug': typeof EventsSlugRoute
+  '/verify/$ticketId': typeof VerifyTicketIdRoute
   '/events/': typeof EventsIndexRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/calendar': typeof AuthenticatedAdminCalendarRoute
@@ -277,9 +305,11 @@ export interface FileRoutesByFullPath {
   '/admin/notices': typeof AuthenticatedAdminNoticesRoute
   '/admin/opportunities': typeof AuthenticatedAdminOpportunitiesRoute
   '/admin/registrations': typeof AuthenticatedAdminRegistrationsRoute
+  '/admin/scanner': typeof AuthenticatedAdminScannerRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/spotlight': typeof AuthenticatedAdminSpotlightRoute
   '/admin/students': typeof AuthenticatedAdminStudentsRoute
+  '/tickets/$ticketId': typeof AuthenticatedTicketsTicketIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/events/$id': typeof AuthenticatedAdminEventsIdRoute
 }
@@ -299,9 +329,11 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/uni-vibe': typeof UniVibeRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/my-tickets': typeof AuthenticatedMyTicketsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/events/$slug': typeof EventsSlugRoute
+  '/verify/$ticketId': typeof VerifyTicketIdRoute
   '/events': typeof EventsIndexRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/calendar': typeof AuthenticatedAdminCalendarRoute
@@ -313,9 +345,11 @@ export interface FileRoutesByTo {
   '/admin/notices': typeof AuthenticatedAdminNoticesRoute
   '/admin/opportunities': typeof AuthenticatedAdminOpportunitiesRoute
   '/admin/registrations': typeof AuthenticatedAdminRegistrationsRoute
+  '/admin/scanner': typeof AuthenticatedAdminScannerRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/spotlight': typeof AuthenticatedAdminSpotlightRoute
   '/admin/students': typeof AuthenticatedAdminStudentsRoute
+  '/tickets/$ticketId': typeof AuthenticatedTicketsTicketIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/events/$id': typeof AuthenticatedAdminEventsIdRoute
 }
@@ -339,9 +373,11 @@ export interface FileRoutesById {
   '/uni-vibe': typeof UniVibeRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/my-tickets': typeof AuthenticatedMyTicketsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/events/$slug': typeof EventsSlugRoute
+  '/verify/$ticketId': typeof VerifyTicketIdRoute
   '/events/': typeof EventsIndexRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/calendar': typeof AuthenticatedAdminCalendarRoute
@@ -353,9 +389,11 @@ export interface FileRoutesById {
   '/_authenticated/admin/notices': typeof AuthenticatedAdminNoticesRoute
   '/_authenticated/admin/opportunities': typeof AuthenticatedAdminOpportunitiesRoute
   '/_authenticated/admin/registrations': typeof AuthenticatedAdminRegistrationsRoute
+  '/_authenticated/admin/scanner': typeof AuthenticatedAdminScannerRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/spotlight': typeof AuthenticatedAdminSpotlightRoute
   '/_authenticated/admin/students': typeof AuthenticatedAdminStudentsRoute
+  '/_authenticated/tickets/$ticketId': typeof AuthenticatedTicketsTicketIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/events/$id': typeof AuthenticatedAdminEventsIdRoute
 }
@@ -379,9 +417,11 @@ export interface FileRouteTypes {
     | '/uni-vibe'
     | '/admin'
     | '/dashboard'
+    | '/my-tickets'
     | '/profile'
     | '/settings'
     | '/events/$slug'
+    | '/verify/$ticketId'
     | '/events/'
     | '/admin/analytics'
     | '/admin/calendar'
@@ -393,9 +433,11 @@ export interface FileRouteTypes {
     | '/admin/notices'
     | '/admin/opportunities'
     | '/admin/registrations'
+    | '/admin/scanner'
     | '/admin/settings'
     | '/admin/spotlight'
     | '/admin/students'
+    | '/tickets/$ticketId'
     | '/admin/'
     | '/admin/events/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -415,9 +457,11 @@ export interface FileRouteTypes {
     | '/terms'
     | '/uni-vibe'
     | '/dashboard'
+    | '/my-tickets'
     | '/profile'
     | '/settings'
     | '/events/$slug'
+    | '/verify/$ticketId'
     | '/events'
     | '/admin/analytics'
     | '/admin/calendar'
@@ -429,9 +473,11 @@ export interface FileRouteTypes {
     | '/admin/notices'
     | '/admin/opportunities'
     | '/admin/registrations'
+    | '/admin/scanner'
     | '/admin/settings'
     | '/admin/spotlight'
     | '/admin/students'
+    | '/tickets/$ticketId'
     | '/admin'
     | '/admin/events/$id'
   id:
@@ -454,9 +500,11 @@ export interface FileRouteTypes {
     | '/uni-vibe'
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
+    | '/_authenticated/my-tickets'
     | '/_authenticated/profile'
     | '/_authenticated/settings'
     | '/events/$slug'
+    | '/verify/$ticketId'
     | '/events/'
     | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/calendar'
@@ -468,9 +516,11 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/notices'
     | '/_authenticated/admin/opportunities'
     | '/_authenticated/admin/registrations'
+    | '/_authenticated/admin/scanner'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/spotlight'
     | '/_authenticated/admin/students'
+    | '/_authenticated/tickets/$ticketId'
     | '/_authenticated/admin/'
     | '/_authenticated/admin/events/$id'
   fileRoutesById: FileRoutesById
@@ -492,6 +542,7 @@ export interface RootRouteChildren {
   SupportRoute: typeof SupportRoute
   TermsRoute: typeof TermsRoute
   UniVibeRoute: typeof UniVibeRoute
+  VerifyTicketIdRoute: typeof VerifyTicketIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -615,6 +666,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventsIndexRouteImport
       parentRoute: typeof EventsRoute
     }
+    '/verify/$ticketId': {
+      id: '/verify/$ticketId'
+      path: '/verify/$ticketId'
+      fullPath: '/verify/$ticketId'
+      preLoaderRoute: typeof VerifyTicketIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/events/$slug': {
       id: '/events/$slug'
       path: '/$slug'
@@ -634,6 +692,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/my-tickets': {
+      id: '/_authenticated/my-tickets'
+      path: '/my-tickets'
+      fullPath: '/my-tickets'
+      preLoaderRoute: typeof AuthenticatedMyTicketsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard': {
@@ -657,6 +722,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/tickets/$ticketId': {
+      id: '/_authenticated/tickets/$ticketId'
+      path: '/tickets/$ticketId'
+      fullPath: '/tickets/$ticketId'
+      preLoaderRoute: typeof AuthenticatedTicketsTicketIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/students': {
       id: '/_authenticated/admin/students'
       path: '/students'
@@ -676,6 +748,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/admin/settings'
       preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/scanner': {
+      id: '/_authenticated/admin/scanner'
+      path: '/scanner'
+      fullPath: '/admin/scanner'
+      preLoaderRoute: typeof AuthenticatedAdminScannerRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/admin/registrations': {
@@ -783,6 +862,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminNoticesRoute: typeof AuthenticatedAdminNoticesRoute
   AuthenticatedAdminOpportunitiesRoute: typeof AuthenticatedAdminOpportunitiesRoute
   AuthenticatedAdminRegistrationsRoute: typeof AuthenticatedAdminRegistrationsRoute
+  AuthenticatedAdminScannerRoute: typeof AuthenticatedAdminScannerRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminSpotlightRoute: typeof AuthenticatedAdminSpotlightRoute
   AuthenticatedAdminStudentsRoute: typeof AuthenticatedAdminStudentsRoute
@@ -801,6 +881,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminNoticesRoute: AuthenticatedAdminNoticesRoute,
     AuthenticatedAdminOpportunitiesRoute: AuthenticatedAdminOpportunitiesRoute,
     AuthenticatedAdminRegistrationsRoute: AuthenticatedAdminRegistrationsRoute,
+    AuthenticatedAdminScannerRoute: AuthenticatedAdminScannerRoute,
     AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
     AuthenticatedAdminSpotlightRoute: AuthenticatedAdminSpotlightRoute,
     AuthenticatedAdminStudentsRoute: AuthenticatedAdminStudentsRoute,
@@ -815,15 +896,19 @@ const AuthenticatedAdminRouteRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedMyTicketsRoute: typeof AuthenticatedMyTicketsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedTicketsTicketIdRoute: typeof AuthenticatedTicketsTicketIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedMyTicketsRoute: AuthenticatedMyTicketsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedTicketsTicketIdRoute: AuthenticatedTicketsTicketIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -859,6 +944,7 @@ const rootRouteChildren: RootRouteChildren = {
   SupportRoute: SupportRoute,
   TermsRoute: TermsRoute,
   UniVibeRoute: UniVibeRoute,
+  VerifyTicketIdRoute: VerifyTicketIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
