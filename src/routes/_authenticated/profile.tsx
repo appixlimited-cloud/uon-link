@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useRef } from "react";
-import { Upload } from "lucide-react";
+import { Upload, Trash2 } from "lucide-react";
 import { PageShell } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -51,16 +51,25 @@ function ProfilePage() {
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) return toast.error("JPG, PNG, or WEBP only");
     setUploading(true);
     try {
-      const ext = file.name.split(".").pop();
+      const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
       const path = `${user.id}/avatar-${Date.now()}.${ext}`;
-      const { error } = await supabase.storage.from("profile-pictures").upload(path, file, { upsert: true });
+      const { error } = await supabase.storage.from("profile-pictures").upload(path, file, { upsert: true, contentType: file.type });
       if (error) throw error;
       const { data } = supabase.storage.from("profile-pictures").getPublicUrl(path);
       await supabase.from("student_profiles").update({ avatar_url: data.publicUrl }).eq("user_id", user.id);
       qc.invalidateQueries({ queryKey: ["profile", user.id] });
+      qc.invalidateQueries({ queryKey: ["nav-avatar", user.id] });
       toast.success("Avatar updated");
     } catch (e: any) { toast.error(e.message ?? "Upload failed"); }
     finally { setUploading(false); }
+  }
+
+  async function removeAvatar() {
+    const { error } = await supabase.from("student_profiles").update({ avatar_url: null }).eq("user_id", user.id);
+    if (error) return toast.error(error.message);
+    qc.invalidateQueries({ queryKey: ["profile", user.id] });
+    qc.invalidateQueries({ queryKey: ["nav-avatar", user.id] });
+    toast.success("Photo removed");
   }
 
   const p = profile.data;
