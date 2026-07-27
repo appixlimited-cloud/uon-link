@@ -34,6 +34,9 @@ function TicketPage() {
         .eq("ticket_code", ticketId)
         .eq("user_id", user.id)
         .maybeSingle();
+      if (data?.events) {
+        data.events = { ...data.events, poster_url: await resolveEventPosterUrl(data.events.poster_url) };
+      }
       return data;
     },
   });
