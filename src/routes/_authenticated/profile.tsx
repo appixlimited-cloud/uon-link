@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { formatShortDate } from "@/lib/format";
+import { resolveAvatarUrl } from "@/lib/avatar-url";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/profile")({
@@ -25,6 +26,12 @@ function ProfilePage() {
   const profile = useQuery({
     queryKey: ["profile", user.id],
     queryFn: async () => (await supabase.from("student_profiles").select("*").eq("user_id", user.id).maybeSingle()).data,
+  });
+
+  const avatarSrc = useQuery({
+    queryKey: ["profile-avatar", user.id, profile.data?.avatar_url],
+    queryFn: async () => resolveAvatarUrl(profile.data?.avatar_url),
+    enabled: !!profile.data?.avatar_url,
   });
 
   const myRegs = useQuery({
@@ -55,10 +62,10 @@ function ProfilePage() {
       const path = `${user.id}/avatar-${Date.now()}.${ext}`;
       const { error } = await supabase.storage.from("profile-pictures").upload(path, file, { upsert: true, contentType: file.type });
       if (error) throw error;
-      const { data } = supabase.storage.from("profile-pictures").getPublicUrl(path);
-      await supabase.from("student_profiles").update({ avatar_url: data.publicUrl }).eq("user_id", user.id);
+      await supabase.from("student_profiles").update({ avatar_url: path }).eq("user_id", user.id);
       qc.invalidateQueries({ queryKey: ["profile", user.id] });
       qc.invalidateQueries({ queryKey: ["nav-avatar", user.id] });
+      qc.invalidateQueries({ queryKey: ["profile-avatar", user.id] });
       toast.success("Avatar updated");
     } catch (e: any) { toast.error(e.message ?? "Upload failed"); }
     finally { setUploading(false); }
@@ -69,6 +76,7 @@ function ProfilePage() {
     if (error) return toast.error(error.message);
     qc.invalidateQueries({ queryKey: ["profile", user.id] });
     qc.invalidateQueries({ queryKey: ["nav-avatar", user.id] });
+      qc.invalidateQueries({ queryKey: ["profile-avatar", user.id] });
     toast.success("Photo removed");
   }
 
@@ -81,8 +89,8 @@ function ProfilePage() {
         <div className="grid gap-8 md:grid-cols-3">
           <aside className="md:col-span-1 space-y-4">
             <div className="flex flex-col items-center text-center">
-              {p?.avatar_url ? (
-                <img src={p.avatar_url} alt="" className="h-28 w-28 rounded-full object-cover" />
+              {avatarSrc.data ? (
+                <img src={avatarSrc.data} alt={`${p?.full_name ?? "Student"} profile photo`} className="h-28 w-28 rounded-full object-cover" />
               ) : (
                 <div className="grid h-28 w-28 place-items-center rounded-full bg-primary text-primary-foreground text-3xl font-bold">{initials}</div>
               )}
