@@ -20,7 +20,12 @@ function MyTicketsPage() {
         .select("id, ticket_code, ticket_tier, status, seat_number, created_at, events(id, slug, title, date, time, venue, category, poster_url)")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
-      return data ?? [];
+      return Promise.all(
+        (data ?? []).map(async (t: any) => ({
+          ...t,
+          events: t.events ? { ...t.events, poster_url: await resolveEventPosterUrl(t.events.poster_url) } : t.events,
+        })),
+      );
     },
   });
 
