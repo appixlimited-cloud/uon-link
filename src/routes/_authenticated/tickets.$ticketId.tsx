@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { formatEventDate } from "@/lib/format";
 import { verifyUrl } from "@/lib/ticket-url";
+import { resolveEventPosterUrl } from "@/lib/storage-url";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/tickets/$ticketId")({
