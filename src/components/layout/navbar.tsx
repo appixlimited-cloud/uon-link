@@ -3,6 +3,7 @@ import { Menu, X, LogOut, Settings, Ticket } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
+import { resolveAvatarUrl } from "@/lib/avatar-url";
 import { Button } from "@/components/ui/button";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { NotificationBell } from "@/components/notification-bell";
@@ -31,7 +32,7 @@ export function Navbar() {
     queryFn: async () => {
       if (!user) return null;
       const { data } = await supabase.from("student_profiles").select("avatar_url").eq("user_id", user.id).maybeSingle();
-      return data?.avatar_url ?? null;
+      return await resolveAvatarUrl(data?.avatar_url);
     },
     enabled: !!user,
     staleTime: 60_000,

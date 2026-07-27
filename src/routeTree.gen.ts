@@ -48,6 +48,7 @@ import { Route as AuthenticatedAdminEventsRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminCreateEventRouteImport } from './routes/_authenticated/admin/create-event'
 import { Route as AuthenticatedAdminClubsRouteImport } from './routes/_authenticated/admin/clubs'
 import { Route as AuthenticatedAdminCalendarRouteImport } from './routes/_authenticated/admin/calendar'
+import { Route as AuthenticatedAdminAttendanceRouteImport } from './routes/_authenticated/admin/attendance'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
 import { Route as AuthenticatedAdminEventsIdRouteImport } from './routes/_authenticated/admin/events.$id'
 
@@ -258,6 +259,12 @@ const AuthenticatedAdminCalendarRoute =
     path: '/calendar',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminAttendanceRoute =
+  AuthenticatedAdminAttendanceRouteImport.update({
+    id: '/attendance',
+    path: '/attendance',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminAnalyticsRoute =
   AuthenticatedAdminAnalyticsRouteImport.update({
     id: '/analytics',
@@ -296,6 +303,7 @@ export interface FileRoutesByFullPath {
   '/verify/$ticketId': typeof VerifyTicketIdRoute
   '/events/': typeof EventsIndexRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
+  '/admin/attendance': typeof AuthenticatedAdminAttendanceRoute
   '/admin/calendar': typeof AuthenticatedAdminCalendarRoute
   '/admin/clubs': typeof AuthenticatedAdminClubsRoute
   '/admin/create-event': typeof AuthenticatedAdminCreateEventRoute
@@ -336,6 +344,7 @@ export interface FileRoutesByTo {
   '/verify/$ticketId': typeof VerifyTicketIdRoute
   '/events': typeof EventsIndexRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
+  '/admin/attendance': typeof AuthenticatedAdminAttendanceRoute
   '/admin/calendar': typeof AuthenticatedAdminCalendarRoute
   '/admin/clubs': typeof AuthenticatedAdminClubsRoute
   '/admin/create-event': typeof AuthenticatedAdminCreateEventRoute
@@ -380,6 +389,7 @@ export interface FileRoutesById {
   '/verify/$ticketId': typeof VerifyTicketIdRoute
   '/events/': typeof EventsIndexRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
+  '/_authenticated/admin/attendance': typeof AuthenticatedAdminAttendanceRoute
   '/_authenticated/admin/calendar': typeof AuthenticatedAdminCalendarRoute
   '/_authenticated/admin/clubs': typeof AuthenticatedAdminClubsRoute
   '/_authenticated/admin/create-event': typeof AuthenticatedAdminCreateEventRoute
@@ -424,6 +434,7 @@ export interface FileRouteTypes {
     | '/verify/$ticketId'
     | '/events/'
     | '/admin/analytics'
+    | '/admin/attendance'
     | '/admin/calendar'
     | '/admin/clubs'
     | '/admin/create-event'
@@ -464,6 +475,7 @@ export interface FileRouteTypes {
     | '/verify/$ticketId'
     | '/events'
     | '/admin/analytics'
+    | '/admin/attendance'
     | '/admin/calendar'
     | '/admin/clubs'
     | '/admin/create-event'
@@ -507,6 +519,7 @@ export interface FileRouteTypes {
     | '/verify/$ticketId'
     | '/events/'
     | '/_authenticated/admin/analytics'
+    | '/_authenticated/admin/attendance'
     | '/_authenticated/admin/calendar'
     | '/_authenticated/admin/clubs'
     | '/_authenticated/admin/create-event'
@@ -820,6 +833,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCalendarRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/attendance': {
+      id: '/_authenticated/admin/attendance'
+      path: '/attendance'
+      fullPath: '/admin/attendance'
+      preLoaderRoute: typeof AuthenticatedAdminAttendanceRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/analytics': {
       id: '/_authenticated/admin/analytics'
       path: '/analytics'
@@ -853,6 +873,7 @@ const AuthenticatedAdminEventsRouteWithChildren =
 
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminAnalyticsRoute: typeof AuthenticatedAdminAnalyticsRoute
+  AuthenticatedAdminAttendanceRoute: typeof AuthenticatedAdminAttendanceRoute
   AuthenticatedAdminCalendarRoute: typeof AuthenticatedAdminCalendarRoute
   AuthenticatedAdminClubsRoute: typeof AuthenticatedAdminClubsRoute
   AuthenticatedAdminCreateEventRoute: typeof AuthenticatedAdminCreateEventRoute
@@ -872,6 +893,7 @@ interface AuthenticatedAdminRouteRouteChildren {
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
   {
     AuthenticatedAdminAnalyticsRoute: AuthenticatedAdminAnalyticsRoute,
+    AuthenticatedAdminAttendanceRoute: AuthenticatedAdminAttendanceRoute,
     AuthenticatedAdminCalendarRoute: AuthenticatedAdminCalendarRoute,
     AuthenticatedAdminClubsRoute: AuthenticatedAdminClubsRoute,
     AuthenticatedAdminCreateEventRoute: AuthenticatedAdminCreateEventRoute,
