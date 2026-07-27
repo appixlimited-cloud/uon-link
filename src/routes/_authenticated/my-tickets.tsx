@@ -4,6 +4,7 @@ import { Ticket, ArrowRight } from "lucide-react";
 import { PageShell } from "@/components/layout/page-shell";
 import { supabase } from "@/integrations/supabase/client";
 import { formatEventDate } from "@/lib/format";
+import { resolveEventPosterUrl } from "@/lib/storage-url";
 
 export const Route = createFileRoute("/_authenticated/my-tickets")({
   head: () => ({ meta: [{ title: "My Tickets — UoN Link" }] }),
@@ -20,7 +21,12 @@ function MyTicketsPage() {
         .select("id, ticket_code, ticket_tier, status, seat_number, created_at, events(id, slug, title, date, time, venue, category, poster_url)")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
-      return data ?? [];
+      return Promise.all(
+        (data ?? []).map(async (t: any) => ({
+          ...t,
+          events: t.events ? { ...t.events, poster_url: await resolveEventPosterUrl(t.events.poster_url) } : t.events,
+        })),
+      );
     },
   });
 

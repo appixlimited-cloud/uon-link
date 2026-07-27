@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { formatEventDate } from "@/lib/format";
 import { verifyUrl } from "@/lib/ticket-url";
+import { resolveEventPosterUrl } from "@/lib/storage-url";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/tickets/$ticketId")({
@@ -34,6 +35,9 @@ function TicketPage() {
         .eq("ticket_code", ticketId)
         .eq("user_id", user.id)
         .maybeSingle();
+      if (data?.events) {
+        data.events = { ...data.events, poster_url: await resolveEventPosterUrl(data.events.poster_url) };
+      }
       return data;
     },
   });
