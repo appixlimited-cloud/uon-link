@@ -4,6 +4,7 @@ import { Ticket, ArrowRight } from "lucide-react";
 import { PageShell } from "@/components/layout/page-shell";
 import { supabase } from "@/integrations/supabase/client";
 import { formatEventDate } from "@/lib/format";
+import { resolveEventPosterUrl } from "@/lib/storage-url";
 
 export const Route = createFileRoute("/_authenticated/my-tickets")({
   head: () => ({ meta: [{ title: "My Tickets — UoN Link" }] }),
