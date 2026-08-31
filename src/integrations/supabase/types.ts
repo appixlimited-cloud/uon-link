@@ -415,7 +415,6 @@ export type Database = {
           faculty: string | null
           full_name: string
           interests: string[] | null
-          is_private: boolean
           is_verified: boolean
           phone: string | null
           registration_number: string | null
@@ -433,7 +432,6 @@ export type Database = {
           faculty?: string | null
           full_name: string
           interests?: string[] | null
-          is_private?: boolean
           is_verified?: boolean
           phone?: string | null
           registration_number?: string | null
@@ -451,7 +449,6 @@ export type Database = {
           faculty?: string | null
           full_name?: string
           interests?: string[] | null
-          is_private?: boolean
           is_verified?: boolean
           phone?: string | null
           registration_number?: string | null
@@ -554,6 +551,22 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      verify_ticket: {
+        Args: { _ticket_code: string }
+        Returns: {
+          checked_in_at: string
+          event_category: string
+          event_date: string
+          event_time: string
+          event_title: string
+          event_venue: string
+          seat_number: string
+          status: Database["public"]["Enums"]["ticket_status"]
+          student_name: string
+          ticket_code: string
+          ticket_tier: string
+        }[]
       }
     }
     Enums: {
