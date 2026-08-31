@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { FACULTIES, YEARS, INTERESTS } from "@/lib/categories";
 import { toast } from "sonner";
+import { GoogleSignInButton } from "@/components/google-sign-in-button";
 
 export function SignupForm() {
   const navigate = useNavigate();
@@ -105,6 +106,14 @@ export function SignupForm() {
     <div className="rounded-lg border border-border bg-card p-7">
       <h2 className="text-2xl font-bold">Create Your Account</h2>
       <p className="text-sm text-muted-foreground mt-1">Join UoN Link to register for events and discover opportunities.</p>
+      <div className="mt-5">
+        <GoogleSignInButton label="Sign up with Google" />
+      </div>
+      <div className="my-5 flex items-center gap-3">
+        <span className="h-px flex-1 bg-border" />
+        <span className="text-xs text-muted-foreground">or sign up with email</span>
+        <span className="h-px flex-1 bg-border" />
+      </div>
       <form onSubmit={submitForm} className="mt-6 space-y-4">
         <div className="grid gap-4 md:grid-cols-2">
           <div><Label>Full Name</Label><Input required value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} /></div>
