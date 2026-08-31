@@ -10,7 +10,6 @@ export const Route = createFileRoute("/verify/$ticketId")({
 });
 
 type TicketRow = {
-  id: string;
   ticket_code: string;
   ticket_tier: string;
   status: "active" | "used" | "cancelled" | "expired";
@@ -25,16 +24,24 @@ function VerifyPage() {
   const { data, isLoading } = useQuery({
     queryKey: ["verify", ticketId],
     queryFn: async () => {
-      const { data } = await (supabase as any)
-        .from("tickets")
-        .select("id, ticket_code, ticket_tier, status, seat_number, checked_in_at, events(title, date, time, venue, category), registrations(student_name)")
-        .eq("ticket_code", ticketId)
-        .maybeSingle();
-      if (!data) return null;
-      return { ...data, student_name: data.registrations?.student_name ?? null } as TicketRow;
+      const { data } = await (supabase as any).rpc("verify_ticket", { _ticket_code: ticketId });
+      const row = Array.isArray(data) ? data[0] : data;
+      if (!row) return null;
+      return {
+        ticket_code: row.ticket_code,
+        ticket_tier: row.ticket_tier,
+        status: row.status,
+        seat_number: row.seat_number,
+        checked_in_at: row.checked_in_at,
+        student_name: row.student_name ?? null,
+        events: row.event_title
+          ? { title: row.event_title, date: row.event_date, time: row.event_time, venue: row.event_venue, category: row.event_category }
+          : null,
+      } as TicketRow;
     },
     staleTime: 30_000,
   });
+
 
   const eventDate = data?.events ? new Date(data.events.date + "T23:59:59") : null;
   const expired = eventDate ? eventDate < new Date() && data?.status === "active" : false;
