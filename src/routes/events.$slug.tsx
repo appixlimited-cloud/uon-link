@@ -132,16 +132,8 @@ function EventDetailPage() {
     }
   };
 
-  const { data: myTicket } = useQuery({
-    queryKey: ["event-ticket", event?.id, user?.id],
-    queryFn: async () => {
-      if (!user || !event) return null;
-      const { data } = await (supabase as any).from("tickets").select("ticket_code").eq("event_id", event.id).eq("user_id", user.id).maybeSingle();
-      return data;
-    },
-    enabled: !!user && !!event && !!existing,
-  });
   const qrValue = myTicket ? `${typeof window !== "undefined" ? window.location.origin : ""}/verify/${myTicket.ticket_code}` : "";
+
 
   return (
     <PageShell>
