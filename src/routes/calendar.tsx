@@ -62,12 +62,23 @@ function CalendarPage() {
     <PageShell>
       <div className="mx-auto max-w-6xl px-4 py-10">
         <header className="flex items-center justify-between flex-wrap gap-3 mb-6">
-          <h1 className="text-3xl font-bold">Event Calendar</h1>
+          <div>
+            <h1 className="text-3xl font-bold">Event Calendar</h1>
+            <p className="text-muted-foreground mt-1 text-sm">Upcoming events with dates, times and venues — tap any event for full details.</p>
+          </div>
           <div className="flex gap-2">
+            <Button variant={view === "list" ? "default" : "outline"} size="sm" onClick={() => setView("list")}><ListIcon className="h-4 w-4 mr-1.5" />Agenda</Button>
             <Button variant={view === "month" ? "default" : "outline"} size="sm" onClick={() => setView("month")}><CalIcon className="h-4 w-4 mr-1.5" />Month</Button>
-            <Button variant={view === "list" ? "default" : "outline"} size="sm" onClick={() => setView("list")}><ListIcon className="h-4 w-4 mr-1.5" />List</Button>
           </div>
         </header>
+
+        {view === "list" && (
+          <div className="mb-5 flex gap-2">
+            <Button size="sm" variant={!showPast ? "secondary" : "ghost"} onClick={() => setShowPast(false)}>Upcoming</Button>
+            <Button size="sm" variant={showPast ? "secondary" : "ghost"} onClick={() => setShowPast(true)}>Past</Button>
+          </div>
+        )}
+
 
         {view === "month" ? (
           <>
