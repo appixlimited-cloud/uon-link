@@ -16,9 +16,10 @@ export const Route = createFileRoute("/calendar")({
 
 function CalendarPage() {
   const events = useQuery({ queryKey: ["events", "calendar"], queryFn: () => fetchPublishedEvents() });
-  const [view, setView] = useState<"month" | "list">("month");
+  const [view, setView] = useState<"month" | "list">("list");
   const [cursor, setCursor] = useState(() => new Date());
   const [selected, setSelected] = useState<string | null>(null);
+  const [showPast, setShowPast] = useState(false);
 
   const byDate = useMemo(() => {
     const m: Record<string, any[]> = {};
@@ -39,6 +40,23 @@ function CalendarPage() {
 
   const monthName = first.toLocaleDateString("en-GB", { month: "long", year: "numeric" });
   const todayKey = new Date().toISOString().slice(0, 10);
+
+  const listEvents = useMemo(() => {
+    const all = events.data ?? [];
+    const upcoming = all.filter((e) => e.date >= todayKey);
+    const past = all.filter((e) => e.date < todayKey).sort((a, b) => (a.date < b.date ? 1 : -1));
+    return showPast ? past : upcoming;
+  }, [events.data, showPast, todayKey]);
+
+  const groupedList = useMemo(() => {
+    const m = new Map<string, any[]>();
+    for (const e of listEvents) {
+      if (!m.has(e.date)) m.set(e.date, []);
+      m.get(e.date)!.push(e);
+    }
+    return Array.from(m.entries());
+  }, [listEvents]);
+
 
   return (
     <PageShell>
