@@ -110,27 +110,50 @@ function CalendarPage() {
           </>
         ) : (
           <div>
-            {!events.data?.length ? (
-              <EmptyState title="No events posted yet" description="Check back soon!" />
+            {events.isLoading ? (
+              <div className="space-y-3">
+                {[0, 1, 2].map((i) => <div key={i} className="h-20 rounded-lg border border-border bg-card animate-pulse" />)}
+              </div>
+            ) : !listEvents.length ? (
+              <EmptyState title={showPast ? "No past events" : "No upcoming events"} description="Check back soon!" />
             ) : (
-              <ul className="divide-y divide-border rounded-lg border border-border bg-card">
-                {events.data.map((e) => {
-                  const lp = lowestPrice(e.event_tickets ?? []);
-                  return (
-                    <li key={e.id} className="flex items-center justify-between gap-3 p-4">
-                      <div className="min-w-0">
-                        <p className="text-xs font-bold text-primary">{formatShortDate(e.date)} · {e.time || "TBA"}</p>
-                        <Link to="/events/$slug" params={{ slug: e.slug }} className="font-medium hover:text-primary">{e.title}</Link>
-                        <p className="text-xs text-muted-foreground">{e.venue || "Venue TBA"} · {lp === null || e.is_free ? "FREE" : `from KSh ${lp}`}</p>
-                      </div>
-                      <a href={googleCalUrl({ title: e.title, date: e.date, time: e.time, venue: e.venue, description: e.description })} target="_blank" rel="noopener noreferrer"><Button size="sm" variant="outline">+ Google</Button></a>
-                    </li>
-                  );
-                })}
-              </ul>
+              <div className="space-y-6">
+                {groupedList.map(([dateKey, items]) => (
+                  <section key={dateKey}>
+                    <h2 className="mb-2 text-sm font-bold uppercase tracking-wide text-primary">
+                      {formatShortDate(dateKey)}{dateKey === todayKey ? " · Today" : ""}
+                    </h2>
+                    <ul className="divide-y divide-border rounded-lg border border-border bg-card">
+                      {items.map((e) => {
+                        const lp = lowestPrice(e.event_tickets ?? []);
+                        return (
+                          <li key={e.id} className="relative flex items-center justify-between gap-3 p-4 hover:bg-accent/50 transition-colors">
+                            <div className="min-w-0">
+                              <p className="text-xs font-semibold text-muted-foreground">{e.time ? e.time.slice(0, 5) : "Time TBA"}</p>
+                              <Link to="/events/$slug" params={{ slug: e.slug }} className="font-medium hover:text-primary after:absolute after:inset-0 after:content-['']">
+                                {e.title}
+                              </Link>
+                              <p className="text-xs text-muted-foreground truncate">{e.venue || "Venue TBA"} · {e.category} · {lp === null || e.is_free ? "FREE" : `from KSh ${lp}`}</p>
+                            </div>
+                            <a
+                              href={googleCalUrl({ title: e.title, date: e.date, time: e.time, venue: e.venue, description: e.description })}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="relative z-10 shrink-0"
+                            >
+                              <Button size="sm" variant="outline">+ Google</Button>
+                            </a>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </section>
+                ))}
+              </div>
             )}
           </div>
         )}
+
       </div>
     </PageShell>
   );
