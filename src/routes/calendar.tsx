@@ -16,9 +16,10 @@ export const Route = createFileRoute("/calendar")({
 
 function CalendarPage() {
   const events = useQuery({ queryKey: ["events", "calendar"], queryFn: () => fetchPublishedEvents() });
-  const [view, setView] = useState<"month" | "list">("month");
+  const [view, setView] = useState<"month" | "list">("list");
   const [cursor, setCursor] = useState(() => new Date());
   const [selected, setSelected] = useState<string | null>(null);
+  const [showPast, setShowPast] = useState(false);
 
   const byDate = useMemo(() => {
     const m: Record<string, any[]> = {};
@@ -40,16 +41,44 @@ function CalendarPage() {
   const monthName = first.toLocaleDateString("en-GB", { month: "long", year: "numeric" });
   const todayKey = new Date().toISOString().slice(0, 10);
 
+  const listEvents = useMemo(() => {
+    const all = events.data ?? [];
+    const upcoming = all.filter((e) => e.date >= todayKey);
+    const past = all.filter((e) => e.date < todayKey).sort((a, b) => (a.date < b.date ? 1 : -1));
+    return showPast ? past : upcoming;
+  }, [events.data, showPast, todayKey]);
+
+  const groupedList = useMemo(() => {
+    const m = new Map<string, any[]>();
+    for (const e of listEvents) {
+      if (!m.has(e.date)) m.set(e.date, []);
+      m.get(e.date)!.push(e);
+    }
+    return Array.from(m.entries());
+  }, [listEvents]);
+
+
   return (
     <PageShell>
       <div className="mx-auto max-w-6xl px-4 py-10">
         <header className="flex items-center justify-between flex-wrap gap-3 mb-6">
-          <h1 className="text-3xl font-bold">Event Calendar</h1>
+          <div>
+            <h1 className="text-3xl font-bold">Event Calendar</h1>
+            <p className="text-muted-foreground mt-1 text-sm">Upcoming events with dates, times and venues — tap any event for full details.</p>
+          </div>
           <div className="flex gap-2">
+            <Button variant={view === "list" ? "default" : "outline"} size="sm" onClick={() => setView("list")}><ListIcon className="h-4 w-4 mr-1.5" />Agenda</Button>
             <Button variant={view === "month" ? "default" : "outline"} size="sm" onClick={() => setView("month")}><CalIcon className="h-4 w-4 mr-1.5" />Month</Button>
-            <Button variant={view === "list" ? "default" : "outline"} size="sm" onClick={() => setView("list")}><ListIcon className="h-4 w-4 mr-1.5" />List</Button>
           </div>
         </header>
+
+        {view === "list" && (
+          <div className="mb-5 flex gap-2">
+            <Button size="sm" variant={!showPast ? "secondary" : "ghost"} onClick={() => setShowPast(false)}>Upcoming</Button>
+            <Button size="sm" variant={showPast ? "secondary" : "ghost"} onClick={() => setShowPast(true)}>Past</Button>
+          </div>
+        )}
+
 
         {view === "month" ? (
           <>
@@ -110,27 +139,50 @@ function CalendarPage() {
           </>
         ) : (
           <div>
-            {!events.data?.length ? (
-              <EmptyState title="No events posted yet" description="Check back soon!" />
+            {events.isLoading ? (
+              <div className="space-y-3">
+                {[0, 1, 2].map((i) => <div key={i} className="h-20 rounded-lg border border-border bg-card animate-pulse" />)}
+              </div>
+            ) : !listEvents.length ? (
+              <EmptyState title={showPast ? "No past events" : "No upcoming events"} description="Check back soon!" />
             ) : (
-              <ul className="divide-y divide-border rounded-lg border border-border bg-card">
-                {events.data.map((e) => {
-                  const lp = lowestPrice(e.event_tickets ?? []);
-                  return (
-                    <li key={e.id} className="flex items-center justify-between gap-3 p-4">
-                      <div className="min-w-0">
-                        <p className="text-xs font-bold text-primary">{formatShortDate(e.date)} · {e.time || "TBA"}</p>
-                        <Link to="/events/$slug" params={{ slug: e.slug }} className="font-medium hover:text-primary">{e.title}</Link>
-                        <p className="text-xs text-muted-foreground">{e.venue || "Venue TBA"} · {lp === null || e.is_free ? "FREE" : `from KSh ${lp}`}</p>
-                      </div>
-                      <a href={googleCalUrl({ title: e.title, date: e.date, time: e.time, venue: e.venue, description: e.description })} target="_blank" rel="noopener noreferrer"><Button size="sm" variant="outline">+ Google</Button></a>
-                    </li>
-                  );
-                })}
-              </ul>
+              <div className="space-y-6">
+                {groupedList.map(([dateKey, items]) => (
+                  <section key={dateKey}>
+                    <h2 className="mb-2 text-sm font-bold uppercase tracking-wide text-primary">
+                      {formatShortDate(dateKey)}{dateKey === todayKey ? " · Today" : ""}
+                    </h2>
+                    <ul className="divide-y divide-border rounded-lg border border-border bg-card">
+                      {items.map((e) => {
+                        const lp = lowestPrice(e.event_tickets ?? []);
+                        return (
+                          <li key={e.id} className="relative flex items-center justify-between gap-3 p-4 hover:bg-accent/50 transition-colors">
+                            <div className="min-w-0">
+                              <p className="text-xs font-semibold text-muted-foreground">{e.time ? e.time.slice(0, 5) : "Time TBA"}</p>
+                              <Link to="/events/$slug" params={{ slug: e.slug }} className="font-medium hover:text-primary after:absolute after:inset-0 after:content-['']">
+                                {e.title}
+                              </Link>
+                              <p className="text-xs text-muted-foreground truncate">{e.venue || "Venue TBA"} · {e.category} · {lp === null || e.is_free ? "FREE" : `from KSh ${lp}`}</p>
+                            </div>
+                            <a
+                              href={googleCalUrl({ title: e.title, date: e.date, time: e.time, venue: e.venue, description: e.description })}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="relative z-10 shrink-0"
+                            >
+                              <Button size="sm" variant="outline">+ Google</Button>
+                            </a>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </section>
+                ))}
+              </div>
             )}
           </div>
         )}
+
       </div>
     </PageShell>
   );
